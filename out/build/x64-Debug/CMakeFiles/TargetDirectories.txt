@@ -1,3 +1,0 @@
-F:/Travail/Cours 2A/INF443/projet/out/build/x64-Debug/CMakeFiles/pgm.dir
-F:/Travail/Cours 2A/INF443/projet/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-F:/Travail/Cours 2A/INF443/projet/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
