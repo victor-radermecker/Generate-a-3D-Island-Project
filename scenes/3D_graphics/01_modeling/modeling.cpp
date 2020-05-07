@@ -57,7 +57,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 // Evaluate height of the terrain for any (u,v) \in [0,1]
 float evaluate_terrain_z(float u, float v)
 {
-    const vec2 u0 = {0.5f, 0.5f};
+    const vec2 u0 = {0.9f, 0.5f};
     const float h0 = 2.0f;
     const float sigma0 = 0.15f;
 
