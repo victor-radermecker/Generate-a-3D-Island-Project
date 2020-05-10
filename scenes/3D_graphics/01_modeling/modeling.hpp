@@ -10,6 +10,15 @@ struct gui_scene_structure
     bool wireframe;
 };
 
+struct perlin_noise
+{
+    float scaling;
+    int octave;
+    float persistency;
+    float height;
+
+};
+
 struct scene_model : scene_base
 {
 
@@ -31,7 +40,16 @@ struct scene_model : scene_base
 
     // visual representation of a surface
     vcl::mesh_drawable terrain;
+   
+    // Ocean
+    vcl::mesh ocean_cpu;
+    vcl::mesh_drawable ocean;
+    vcl::buffer<vcl::vec3> ocean_positions;
+    vcl::buffer<vcl::vec3> ocean_normals;
+    vcl::buffer<vcl::uint3> ocean_connectivity;
+    perlin_noise ocean_perlin;
 
+    vcl::timer_interval timer;
     gui_scene_structure gui_scene;
 };
 

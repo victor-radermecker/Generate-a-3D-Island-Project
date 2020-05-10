@@ -1,3 +1,5 @@
+#include <cmath>
+#include <iostream>
 
 #include "modeling.hpp"
 
@@ -14,6 +16,10 @@ float evaluate_terrain_z(float u, float v);
 vec3 evaluate_terrain(float u, float v);
 mesh create_terrain();
 
+mesh create_ocean();
+void update_ocean(mesh_drawable& ocean, buffer<vec3>& ocean_positions, buffer<vec3>& current_normals, buffer<uint3> connectivity, float t, float tmax, perlin_noise p);
+
+
 
 /** This function is called before the beginning of the animation loop
     It is used to initialize all part-specific data */
@@ -21,14 +27,29 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
 {
     // Create visual terrain surface
     terrain = create_terrain();
-    terrain.uniform.color = {0.6f,0.85f,0.5f};
-    terrain.uniform.shading.specular = 0.0f; // non-specular terrain material
+    terrain.uniform.color = { 0.2f, 0.8f, 0.5f };
+
+    // Create ocean
+    ocean_cpu = create_ocean();
+    ocean_positions = ocean_cpu.position;
+    ocean_normals = ocean_cpu.normal;
+    ocean_connectivity = ocean_cpu.connectivity;
+    ocean = ocean_cpu;
+    ocean.uniform.color = {0.2f,0.5f,0.9f};
+
+    ocean_perlin.height = 0.01f;
+    ocean_perlin.octave = 8;
+    ocean_perlin.persistency = 0.55f;
+    ocean_perlin.scaling = 2.0f;
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
     scene.camera.scale = 10.0f;
     scene.camera.apply_rotation(0,0,0,1.2f);
 
+    // Timer parameters
+    timer.t_max = 10.0f;
+    timer.scale = 1.0f;
 }
 
 
@@ -37,7 +58,12 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
     It is used to compute time-varying argument and perform data data drawing */
 void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_structure& scene, gui_structure& )
 {
+    timer.update();
+
     set_gui();
+
+    const float t = timer.t;
+
 
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
 
@@ -50,6 +76,11 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
         glPolygonOffset( 1.0, 1.0 );
         draw(terrain, scene.camera, shaders["wireframe"]);
     }
+    
+    // Display ocean
+    update_ocean(ocean, ocean_positions, ocean_normals, ocean_connectivity, t, timer.t_max, ocean_perlin);
+    draw(ocean, scene.camera, shaders["mesh"]);
+
 }
 
 
@@ -58,8 +89,8 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 float evaluate_terrain_z(float u, float v)
 {
     const vec2 u0 = {0.5f, 0.5f};
-    const float h0 = 2.0f;
-    const float sigma0 = 0.15f;
+    const float h0 = 4.0f;
+    const float sigma0 = 0.30f;
 
     const float d = norm(vec2(u,v)-u0)/sigma0;
 
@@ -77,6 +108,7 @@ vec3 evaluate_terrain(float u, float v)
 
     return {x,y,z};
 }
+
 
 // Generate terrain mesh
 mesh create_terrain()
@@ -122,9 +154,125 @@ mesh create_terrain()
     return terrain;
 }
 
+vec3 evaluate_ocean(float u, float v)
+{
+    const float x = 40 * (u - 0.5f);
+    const float y = 40 * (v - 0.5f);
+    float z = 0.3f;
+
+    return { x,y,z };
+}
+
+mesh create_ocean()
+{
+    // Number of samples of the ocean is N x N
+    const size_t N = 75;
+
+    mesh ocean; // temporary terrain storage (CPU only)
+    ocean.position.resize(N * N);
+
+    // Fill terrain geometry
+    for (size_t ku = 0; ku < N; ++ku)
+    {
+        for (size_t kv = 0; kv < N; ++kv)
+        {
+            // Compute local parametric coordinates (u,v) \in [0,1]
+            const float u = ku / (N - 1.0f);
+            const float v = kv / (N - 1.0f);
+
+            // Compute coordinates
+            ocean.position[kv + N * ku] = evaluate_ocean(u,v);
+        }
+    }
+
+
+    // Generate triangle organization
+    //  Parametric surface with uniform grid sampling: generate 2 triangles for each grid cell
+    const unsigned int Ns = N;
+    for (unsigned int ku = 0; ku < Ns - 1; ++ku)
+    {
+        for (unsigned int kv = 0; kv < Ns - 1; ++kv)
+        {
+            const unsigned int idx = kv + N * ku; // current vertex offset
+
+            const uint3 triangle_1 = { idx, idx + 1 + Ns, idx + 1 };
+            const uint3 triangle_2 = { idx, idx + Ns, idx + 1 + Ns };
+
+            ocean.connectivity.push_back(triangle_1);
+            ocean.connectivity.push_back(triangle_2);
+        }
+    }
+
+    return ocean;
+}
+
+void update_ocean(mesh_drawable& ocean, buffer<vec3>& current_position, buffer<vec3>& current_normals, buffer<uint3> connectivity, float t, float tmax, perlin_noise p)
+{
+    const size_t N = 75;
+    for (size_t ku = 0; ku < N; ++ku)
+    {
+        for (size_t kv = 0; kv < N; ++kv)
+        {
+            // Compute local parametric coordinates (u,v) \in [0,1]
+            const float u = ku / (N - 1.0f);
+            const float v = kv / (N - 1.0f);
+            
+            // Vector from center of island to current point
+            vec2 r = { 0.5f - u, 0.5f - v };
+
+            // Compute wave amplitude
+            // The closer from ilsand, the higher the amplitude
+            float amplitude = 0.05f +  0.8f * exp( -7.0f * norm( r));
+
+
+            // Compute spatial wave vector
+            // The closer from the island, the lower the wave langth
+            float k = 1.0f + 15.0f * exp(2.0f * norm(r));
+
+            // Compute wave pulsation
+            // We assume it is constant
+            // It has to be a multiple of 2*pi/tmax
+            float pulsation = 2.0f * (2.0f * 3.14159f / tmax);
+
+
+            // Compute coordinates : progressive wave
+            float old_position = current_position[kv + N * ku][2];
+            current_position[kv + N * ku][2] = 0.8f + amplitude * cos(k * norm(r) + pulsation * t );
+
+            /* Apply perlin noise */
+            const float noise = perlin(p.scaling * u, p.scaling * v, p.octave, p.persistency);
+            current_position[kv + N * ku][2] *= noise;
+
+            /*
+            // If the wave "hit" the ground
+            // To modify later : ut and vt are the generalised coordinates in the referential of the terrain
+            float ut = (u - 0.25f) * 2.0f;
+            float vt = (v - 0.25f) * 2.0f;
+
+            if (ut <= 1 && ut >= 0 && vt <= 1 && vt >= 0)
+            {
+                float terrain_height = evaluate_terrain_z(ut, vt);
+                if (old_position > terrain_height && current_position[kv + N * ku][2] <= terrain_height)
+                {
+                    current_position[kv + N * ku][2] = terrain_height - 0.005f;
+                }
+            }
+            */
+        }
+    }
+    vcl::normal(current_position, connectivity, current_normals);
+    ocean.update_normal(current_normals);
+    ocean.update_position(current_position);
+}
+
+
 void scene_model::set_gui()
 {
     ImGui::Checkbox("Wireframe", &gui_scene.wireframe);
+    ImGui::Spacing();
+    ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
+    ImGui::SliderFloat("Time scale", &timer.scale, 0.1f, 3.0f);
+
 }
 
 
