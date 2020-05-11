@@ -114,6 +114,7 @@ mesh terrain_model::create_ocean()
 
     mesh ocean; // temporary terrain storage (CPU only)
     ocean.position.resize(N * N);
+    ocean.texture_uv.resize(N * N);
 
     // Fill terrain geometry
     for (size_t ku = 0; ku < N; ++ku)
@@ -126,6 +127,7 @@ mesh terrain_model::create_ocean()
 
             // Compute coordinates
             ocean.position[kv + N * ku] = evaluate_ocean(u, v);
+            ocean.texture_uv[kv + N * ku] = { 5.0f * u, 5.0f * v };
         }
     }
     // Generate triangle organization
@@ -164,7 +166,7 @@ void terrain_model::update_ocean(mesh_drawable& ocean, buffer<vec3>& current_pos
 
             // Compute wave amplitude
             // The closer from ilsand, the higher the amplitude
-            float amplitude = 0.05f + 1.5f * exp(-6.5f * norm(r));
+            float amplitude = 0.05f + 0.3f * exp(-4.0f * norm(r));
 
 
             // Compute spatial wave vector
@@ -216,8 +218,16 @@ void terrain_model::set_ocean()
     ocean_positions = ocean_cpu.position;
     ocean_normals = ocean_cpu.normal;
     ocean_connectivity = ocean_cpu.connectivity;
+    ocean_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/ocean_texture.png"));
     ocean = ocean_cpu;
     ocean.uniform.color = { 0.2f,0.5f,0.9f };
+    
+    // Illumination parameters
+    ocean.uniform.shading.ambiant = 1.0f;
+    ocean.uniform.shading.diffuse = 0.3f;
+    ocean.uniform.shading.specular = 0.8f;
+    ocean.uniform.shading.specular_exponent = 512;
+
 
     ocean_perlin.height = 0.01f;
     ocean_perlin.octave = 10;
