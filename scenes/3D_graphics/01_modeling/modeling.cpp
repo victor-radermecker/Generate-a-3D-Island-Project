@@ -38,7 +38,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
     ocean.uniform.color = {0.2f,0.5f,0.9f};
 
     ocean_perlin.height = 0.01f;
-    ocean_perlin.octave = 8;
+    ocean_perlin.octave = 10;
     ocean_perlin.persistency = 0.55f;
     ocean_perlin.scaling = 2.0f;
 
@@ -89,7 +89,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 float evaluate_terrain_z(float u, float v)
 {
     const vec2 u0 = {0.5f, 0.5f};
-    const float h0 = 4.0f;
+    const float h0 = 6.0f;
     const float sigma0 = 0.30f;
 
     const float d = norm(vec2(u,v)-u0)/sigma0;
@@ -222,17 +222,18 @@ void update_ocean(mesh_drawable& ocean, buffer<vec3>& current_position, buffer<v
 
             // Compute wave amplitude
             // The closer from ilsand, the higher the amplitude
-            float amplitude = 0.05f +  0.8f * exp( -7.0f * norm( r));
+            float amplitude = 0.05f +  1.5f * exp( -6.5f * norm( r));
 
 
             // Compute spatial wave vector
             // The closer from the island, the lower the wave langth
-            float k = 1.0f + 15.0f * exp(2.0f * norm(r));
+            float k = 1.0f + 13.0f * exp(2.0f * norm(r));
 
             // Compute wave pulsation
             // We assume it is constant
             // It has to be a multiple of 2*pi/tmax
-            float pulsation = 2.0f * (2.0f * 3.14159f / tmax);
+            float min_pulsation = 2.0f * 3.14159f / tmax;
+            float pulsation = 2.0f * min_pulsation;
 
 
             // Compute coordinates : progressive wave
@@ -240,7 +241,8 @@ void update_ocean(mesh_drawable& ocean, buffer<vec3>& current_position, buffer<v
             current_position[kv + N * ku][2] = 0.8f + amplitude * cos(k * norm(r) + pulsation * t );
 
             /* Apply perlin noise */
-            const float noise = perlin(p.scaling * u, p.scaling * v, p.octave, p.persistency);
+            float scaling = p.scaling * (1.0f + 0.05f * (1.0f - cos(pulsation * t)));
+            const float noise = perlin(scaling * (u-0.5f), scaling * (v-0.5f), p.octave, p.persistency);
             current_position[kv + N * ku][2] *= noise;
 
             /*
