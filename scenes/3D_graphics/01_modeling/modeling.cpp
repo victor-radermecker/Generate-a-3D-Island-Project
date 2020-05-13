@@ -58,21 +58,27 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 
     // Display terrain
     glPolygonOffset( 1.0, 1.0 );
-    draw(env.terrain, scene.camera, shaders["mesh_sun"]);
-    
+
+    draw(env.terrain[0], scene.camera, shaders["mesh_sun"]);
+
+    draw(env.terrain[1], scene.camera, shaders["mesh_sun"]);
+
+
     if( gui_scene.wireframe ){ // wireframe if asked from the GUI
         glPolygonOffset( 1.0, 1.0 );
-        draw(env.terrain, scene.camera, shaders["wireframe"]);
+        draw(env.terrain[0], scene.camera, shaders["wireframe"]);
+
     }
     
     // Display ocean
+    
     glBindTexture(GL_TEXTURE_2D, env.ocean_texture_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
     env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
     draw(env.ocean, scene.camera, shaders["mesh_sun"]);
-
+    
 }
 
 void scene_model::set_gui()

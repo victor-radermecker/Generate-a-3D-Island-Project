@@ -1,6 +1,8 @@
 #include "Environment.hpp"
 #include <algorithm>
 #include <iostream> 
+#include <stdlib.h>    
+#include <ctime>
 
 using namespace vcl;
 
@@ -11,7 +13,7 @@ using namespace vcl;
 
 
 // Generate terrain mesh
-mesh terrain_model::create_terrain()
+mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 })
 {
     // Number of samples of the terrain is N x N
     const size_t N = 300;
@@ -25,7 +27,7 @@ mesh terrain_model::create_terrain()
             // Compute local parametric coordinates (u,v) \in [0,1]
             const float u = ku / (N - 1.0f); // ex. u=0.5 quand on est à la fin du terrain donc u = 99/99 = 1
             const float v = kv / (N - 1.0f);
-            vec3 position = evaluate_terrain(u, v);
+            vec3 position = evaluate_terrain(u, v, type, p0);
             // Compute coordinates
             terrain.position[kv + N * ku] = position;
             terrain.texture_uv[kv + N * ku] = { u * 7,v * 7 };
@@ -52,43 +54,50 @@ mesh terrain_model::create_terrain()
 }
 
 
+
+vec3 terrain_model::evaluate_terrain(float u, float v, std::string type = "None", vec3 p0 = { 0,0,0 })
+{
+    vec3 p = { 0,0,0 };
+    
+    if (type == "volcano") {
+        p = evaluate_terrain_volcano(u, v) ;
+    }
+    else if (type == "sand") {
+        p = evaluate_terrain_sand(u, v);
+    }
+
+    else {
+        float x = 0;
+        float y = 0;
+        float z = evaluate_terrain_z(u, v);   
+        p = { x,y,z };
+    }
+    return p + p0;
+}
+
 // Evaluate height of the terrain for any (u,v) \in [0,1]
 float terrain_model::evaluate_terrain_z(float u, float v)
 {
+    float z = 0;
+    // Normal gaussian
     const vec2 u0 = { 0.5f, 0.5f };
-    const float h0 = 6.0f;
-    const float sigma0 = 0.30f;
-
+    const float h0 = 15.0f;
+    const float sigma0 = 0.18f;
     const float d = norm(vec2(u, v) - u0) / sigma0;
-
-    const float z = h0 * std::exp(-d * d);
+    z = h0 * std::exp(-d * d);
 
     return z;
 }
 
-vec3 terrain_model::evaluate_terrain(float u, float v)
-{
-    //set parameters for Perlin Noise
-    const float scaling = 3.0;
-    const int octave = 7;
-    const float persistency = 0.5;
-    const float height = 0.8;
-
-    // Evaluate Perlin noise
-    const float noise = perlin(scaling * u, scaling * v, octave, persistency);
-    const float c = 0.3f + 0.7f * noise;
-
-    const float x = 20 * (u - 0.5f); //permet d'avoir x=-10 en u=0 et x=10 en u=1
-    const float y = 20 * (v - 0.5f);
-    const float z = evaluate_terrain_z(u, v) * noise;
-
-    return { x,y,z };
-}
-
 void terrain_model::set_terrain()
 {
-    terrain = create_terrain();
-    terrain.uniform.color = { 1.0f, 1.0f, 1.0f };
+    islands.set_island_parameters(islands.u0, islands.h, islands.sigma, islands.N);
+
+    terrain.push_back(create_terrain("volcano", { 0,0,0 }));
+    terrain.push_back(create_terrain("sand", { 0,0,0 }));
+    terrain[0].uniform.color = { 1.0f, 1.0f, 1.0f };
+    terrain[0].uniform.transform.scaling = 1.5f;
+    terrain[0].uniform.transform.translation = { 0,0,-2.0f };
 }
 
 
@@ -100,8 +109,8 @@ void terrain_model::set_terrain()
 
 vec3 terrain_model::evaluate_ocean(float u, float v)
 {
-    const float x = 40 * (u - 0.5f);
-    const float y = 40 * (v - 0.5f);
+    const float x = 200 * (u - 0.5f);
+    const float y = 200 * (v - 0.5f);
     float z = 0.3f;
 
     return { x,y,z };
@@ -221,7 +230,8 @@ void terrain_model::set_ocean()
     ocean_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/ocean_texture.png"));
     ocean = ocean_cpu;
     ocean.uniform.color = { 0.2f,0.5f,0.9f };
-    
+    ocean.uniform.transform.translation = { 0,0,1.0f };
+
     // Illumination parameters
     ocean.uniform.shading.ambiant = 1.0f;
     ocean.uniform.shading.diffuse = 0.3f;
@@ -234,3 +244,137 @@ void terrain_model::set_ocean()
     ocean_perlin.persistency = 0.55f;
     ocean_perlin.scaling = 2.0f;
 }
+
+
+
+
+
+// --------------------------------------------------- //
+//                  Volcano Generation                 //
+// --------------------------------------------------- //
+
+
+vec3 terrain_model::evaluate_terrain_volcano(float u, float v)
+{
+    //set parameters for Perlin Noise
+    const float scaling = 2.5;
+    const int octave = 6;
+    const float persistency = 0.6;
+    const float height = 0.5;
+
+    // Evaluate Perlin noise
+    const float noise = perlin(scaling * u, scaling * v, octave, persistency);
+
+    float c = 0.3f + 0.7f * noise;
+    float x = 60 * (u - 0.5f);
+    float y = 60 * (v - 0.5f);
+    float z = evaluate_terrain_z_volcano(u, v);
+    z *= 1 + c * std::exp(-z / 10);
+    return { x,y,z };
+}
+
+float terrain_model::evaluate_terrain_z_volcano(float u, float v)
+{
+    float z = 0;
+    const vec2 u0 = { 0.5f, 0.5f };
+    const float h0 = 25.0f;
+    const float sigma0 = 0.065f;
+
+    //normal 1
+    const float d = norm(vec2(u, v) - u0) / sigma0;
+    z = h0 * std::exp(-d * d);
+    
+    //normal 2 (cratère)
+    const float d2 = norm(vec2(u, v) - u0) / (sigma0 / 2);
+    z -= (h0 / 2) * std::exp(-d2 * d2);
+
+    //normal 3 (cratère) --> élargir la base du cone
+    const float d3 = norm(vec2(u, v) - u0) / (sigma0 *5);
+    z += (h0 / 5) * std::exp(-d3 * d3);
+
+    return z;
+}
+
+
+
+// --------------------------------------------------- //
+//                  Sand Generation                 //
+// --------------------------------------------------- //
+
+
+
+vec3 terrain_model::evaluate_terrain_sand(float u, float v)
+{
+    //set parameters for Perlin Noise
+    const float scaling = 2.5;
+    const int octave = 6;
+    const float persistency = 0.8;
+    const float height = 0.5;
+    const float noise = perlin(scaling * u, scaling * v, octave, persistency);
+
+    float c = 0.3f + 0.7f * noise;
+    float x = 200 * (u - 0.5f);
+    float y = 200 * (v - 0.5f);
+    float z = evaluate_terrain_z_sand(u, v);
+    z *= 1 + c * std::exp(- abs(z) /15);
+
+    return { x,y,z };
+}
+
+
+float terrain_model::evaluate_terrain_z_sand(float u, float v)
+{
+    float z = 0;
+    for (int i = 0;i < islands.N;i++) {
+        float d = norm(vec2(u, v) - islands.u0[i]) / islands.sigma[i];
+        z += islands.h[i] * std::exp(-d * d);
+    }
+    //Cratère pour ne pas dépasser sur le volcan
+    const float d = norm(vec2(u, v) - vec2(0.5,0.5)) / (0.15);
+    z -= 10.0f * std::exp(-d * d);
+
+    return z;
+
+}
+
+
+void island_param::set_island_parameters(std::vector<vec2>& u0, std::vector<float>& h, std::vector<float>& sigma, int& N)
+{
+    N = 8;
+    srand((unsigned)time(0)); // use current time as seed for random generator
+    
+    for (int i = 0;i < N;i++) {
+        float r2 = ((double)rand() / (RAND_MAX));
+        float r1 = ((double)rand() / (RAND_MAX));
+        //u0.push_back({ r1*0.8f,r2*0.8f  });
+        h.push_back(r1 * 15 + r2 * 15);
+        //sigma.push_back(r1 / 10.0f);
+    }
+    int n = 3.5;
+    u0.push_back(vec2(0.2, 0.6));
+    u0.push_back(vec2(0.12, 0.15));
+    u0.push_back(vec2(0.2, 0.82));
+    u0.push_back(vec2(0.3, 0.14));
+    u0.push_back(vec2(0.1, 0.2));
+    u0.push_back(vec2(0.2, 0.35));
+    u0.push_back(vec2(0.9, 0.85));
+    u0.push_back(vec2(0.78, 0.32));
+    sigma.push_back(0.2f/n);
+    sigma.push_back(0.3f/n);
+    sigma.push_back(0.25f/n);
+    sigma.push_back(0.32f/n);
+    sigma.push_back(0.26f/n);
+    sigma.push_back(0.14f/n);
+    sigma.push_back(0.18f/n);
+    sigma.push_back(0.22f/n);
+    sigma.push_back(0.47f/n);
+
+
+
+
+
+}
+
+
+
+
