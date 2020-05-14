@@ -49,6 +49,8 @@ void load_shaders(std::map<std::string,GLuint>& shaders)
 
     shaders["mesh"] = create_shader_program("scenes/shared_assets/shaders/mesh/shader.vert.glsl","scenes/shared_assets/shaders/mesh/shader.frag.glsl");
     shaders["mesh_sun"] = create_shader_program("scenes/shared_assets/shaders/mesh_sun/shader.vert.glsl", "scenes/shared_assets/shaders/mesh_sun/shader.frag.glsl");
+    shaders["terrain"] = create_shader_program("scenes/shared_assets/shaders/terrain/shader.vert.glsl", "scenes/shared_assets/shaders/terrain/shader.frag.glsl");
+    shaders["terrain1"] = create_shader_program("scenes/shared_assets/shaders/terrain1/shader.vert.glsl", "scenes/shared_assets/shaders/terrain1/shader.frag.glsl");
     shaders["mesh_bf"] = create_shader_program("scenes/shared_assets/shaders/mesh_back_illumination/mesh.vert.glsl","scenes/shared_assets/shaders/mesh_back_illumination/mesh.frag.glsl");
     shaders["wireframe"] = create_shader_program("scenes/shared_assets/shaders/wireframe/shader.vert.glsl","scenes/shared_assets/shaders/wireframe/shader.geom.glsl","scenes/shared_assets/shaders/wireframe/shader.frag.glsl");
     shaders["wireframe_quads"] = create_shader_program("scenes/shared_assets/shaders/wireframe_quads/shader.vert.glsl","scenes/shared_assets/shaders/wireframe_quads/shader.geom.glsl","scenes/shared_assets/shaders/wireframe_quads/shader.frag.glsl");

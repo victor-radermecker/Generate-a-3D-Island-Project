@@ -50,28 +50,52 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 {
     timer.update();
     const float t = timer.t;
-
     set_gui();
-
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
+    glPolygonOffset(1.0, 1.0);
 
 
-    // Display terrain
-    glPolygonOffset( 1.0, 1.0 );
+    /**********************************************************/
+    /********************* DISPLAY TERRAIN ********************/
+    /**********************************************************/
 
-    draw(env.terrain[0], scene.camera, shaders["mesh_sun"]);
+    glUseProgram(shaders["terrain"]);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, env.texture_ids.sand_id);
+    uniform(shaders["terrain"], "sand_sampler", 0); opengl_debug();
 
-    draw(env.terrain[1], scene.camera, shaders["mesh_sun"]);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
+    uniform(shaders["terrain"], "grass_sampler", 1); opengl_debug();
 
-
-    if( gui_scene.wireframe ){ // wireframe if asked from the GUI
-        glPolygonOffset( 1.0, 1.0 );
-        draw(env.terrain[0], scene.camera, shaders["wireframe"]);
-
-    }
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, env.texture_ids.rock_id);
+    uniform(shaders["terrain"], "rock_sampler", 2); 
     
-    // Display ocean
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+
+    draw(env.terrain[0], scene.camera, shaders["terrain"]);
+
+
+    glUseProgram(shaders["terrain1"]);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, env.texture_ids.sand_id);
+    uniform(shaders["terrain1"], "sand_sampler", 0); opengl_debug();
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
+    uniform(shaders["terrain1"], "grass_sampler", 1); opengl_debug();
+
+
+    draw(env.terrain[1], scene.camera, shaders["terrain1"]);
     
+
+    /**********************************/
+    //        Display ocean           //
+    /*********************************/
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, env.ocean_texture_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);

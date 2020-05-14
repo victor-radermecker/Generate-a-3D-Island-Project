@@ -10,6 +10,13 @@ struct perlin_noise
 	float height;
 };
 
+struct terrain_textures
+{
+	GLuint sand_id; // Sand texture id
+	GLuint grass_id; // Grass texture id
+	GLuint rock_id; // Rock texture id
+};
+
 struct island_param
 {
 	std::vector<vcl::vec2> u0;
@@ -38,6 +45,16 @@ struct terrain_model
 	void update_ocean(vcl::mesh_drawable& ocean, vcl::buffer<vcl::vec3>& current_position, vcl::buffer<vcl::vec3>& current_normals, vcl::buffer<vcl::uint3> connectivity, float t, float tmax, perlin_noise p);
 	void set_ocean();
 
+	// Ocean
+	vcl::mesh ocean_cpu;
+	vcl::mesh_drawable ocean;
+	vcl::buffer<vcl::vec3> ocean_positions;
+	vcl::buffer<vcl::vec3> ocean_normals;
+	vcl::buffer<vcl::uint3> ocean_connectivity;
+	perlin_noise ocean_perlin;
+
+
+
 	//volcano
 	float evaluate_terrain_z_volcano(float u, float v);
 	vcl::vec3 terrain_model::evaluate_terrain_volcano(float u, float v);
@@ -47,21 +64,14 @@ struct terrain_model
 	float evaluate_terrain_z_sand(float u, float v);
 
 
-
 	//Mesh objects
 	std::vector<vcl::mesh_drawable> terrain;
 
 	//Small islands parameters
 	island_param islands;
 
-	// Ocean
-	vcl::mesh ocean_cpu;
-	vcl::mesh_drawable ocean;
-	vcl::buffer<vcl::vec3> ocean_positions;
-	vcl::buffer<vcl::vec3> ocean_normals;
-	vcl::buffer<vcl::uint3> ocean_connectivity;
-	perlin_noise ocean_perlin;
-
+	// Terrain textures
+	terrain_textures texture_ids;
 
 
 

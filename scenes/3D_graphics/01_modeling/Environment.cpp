@@ -16,7 +16,7 @@ using namespace vcl;
 mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 })
 {
     // Number of samples of the terrain is N x N
-    const size_t N = 300;
+    const size_t N = 600;
     mesh terrain; // temporary terrain storage (CPU only)
     terrain.position.resize(N * N);
     terrain.texture_uv.resize(N * N); //Initalize buffer for textures
@@ -30,7 +30,7 @@ mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 
             vec3 position = evaluate_terrain(u, v, type, p0);
             // Compute coordinates
             terrain.position[kv + N * ku] = position;
-            terrain.texture_uv[kv + N * ku] = { u * 7,v * 7 };
+            terrain.texture_uv[kv + N * ku] = { 15.0f * u , 15.0f * v  }; 
             //terrain.color[kv + N * ku] = { c,c,c,1.0f };
         }
     }
@@ -98,6 +98,11 @@ void terrain_model::set_terrain()
     terrain[0].uniform.color = { 1.0f, 1.0f, 1.0f };
     terrain[0].uniform.transform.scaling = 1.5f;
     terrain[0].uniform.transform.translation = { 0,0,-2.0f };
+
+    texture_ids.sand_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/sand.png"));
+    texture_ids.grass_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/grass-rock.png"));
+    texture_ids.rock_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/volcano-rock.png"));
+
 }
 
 
@@ -119,7 +124,7 @@ vec3 terrain_model::evaluate_ocean(float u, float v)
 mesh terrain_model::create_ocean()
 {
     // Number of samples of the ocean is N x N
-    const size_t N = 75;
+    const size_t N = 50;
 
     mesh ocean; // temporary terrain storage (CPU only)
     ocean.position.resize(N * N);
@@ -161,7 +166,7 @@ mesh terrain_model::create_ocean()
 
 void terrain_model::update_ocean(mesh_drawable& ocean, buffer<vec3>& current_position, buffer<vec3>& current_normals, buffer<uint3> connectivity, float t, float tmax, perlin_noise p)
 {
-    const size_t N = 75;
+    const size_t N = 50;
     for (size_t ku = 0; ku < N; ++ku)
     {
         for (size_t kv = 0; kv < N; ++kv)
@@ -175,7 +180,7 @@ void terrain_model::update_ocean(mesh_drawable& ocean, buffer<vec3>& current_pos
 
             // Compute wave amplitude
             // The closer from ilsand, the higher the amplitude
-            float amplitude = 0.05f + 0.3f * exp(-4.0f * norm(r));
+            float amplitude = 0.1f + 0.4f * exp(-3.0f * norm(r));
 
 
             // Compute spatial wave vector
@@ -239,7 +244,7 @@ void terrain_model::set_ocean()
     ocean.uniform.shading.specular_exponent = 512;
 
 
-    ocean_perlin.height = 0.01f;
+    ocean_perlin.height = 0.05f;
     ocean_perlin.octave = 10;
     ocean_perlin.persistency = 0.55f;
     ocean_perlin.scaling = 2.0f;
@@ -258,7 +263,7 @@ vec3 terrain_model::evaluate_terrain_volcano(float u, float v)
 {
     //set parameters for Perlin Noise
     const float scaling = 2.5;
-    const int octave = 6;
+    const int octave = 8;
     const float persistency = 0.6;
     const float height = 0.5;
 
