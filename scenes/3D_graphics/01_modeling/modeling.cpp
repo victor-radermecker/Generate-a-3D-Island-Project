@@ -28,12 +28,13 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
 {
     // Create and initialise terrain surface
     env.set_terrain();
-
     // Create and initialise ocean
     env.set_ocean();
 
-    // Create skybox
-    skybox.set_skybox();
+    //create first palm tree
+    veg.set_palm_tree();
+    veg.init_forest(10, veg.tree_position, 4.0f, 0.05f, "volcano");
+
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
@@ -67,12 +68,19 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 
     env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
     draw(env.ocean, scene.camera, shaders["mesh_sun"]);
+    draw(veg.palm_tree, scene.camera, shaders["terrain1"]);
+
+    for (int i = 0; i < veg.tree_position.size();i++) {
+        vec3 pos = veg.tree_position[i];
+        veg.palm_tree.uniform.transform.translation = pos;
+        draw(veg.palm_tree, scene.camera, shaders["terrain1"]);
+    }
 
 
     /**********************************************************/
     /********************* DISPLAY TERRAIN ********************/
     /**********************************************************/
-
+    
     glUseProgram(shaders["terrain"]);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, env.texture_ids.sand_id);
@@ -102,6 +110,11 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
     uniform(shaders["terrain1"], "grass_sampler", 1); opengl_debug();
 
+<<<<<<< HEAD
+=======
+    
+    draw(env.terrain[1], scene.camera, shaders["terrain1"]);
+>>>>>>> b84978c574fe675c42ed9af5b9f579922e30cbbf
     
     draw(env.terrain[1], scene.camera, shaders["terrain1"]);
 

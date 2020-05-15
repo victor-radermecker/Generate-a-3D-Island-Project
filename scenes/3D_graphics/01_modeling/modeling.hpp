@@ -2,7 +2,7 @@
 
 #include "main/scene_base/base.hpp"
 #include "Environment.hpp"
-#include "Skybox.hpp"
+#include "vegetation.hpp"
 
 #ifdef SCENE_3D_GRAPHICS
 
@@ -30,9 +30,10 @@ struct scene_model : scene_base
 
     // Ocean + terrain
     terrain_model env;
+    vegetation_model veg;
+
 
     // Skybox
-    skybox_model skybox;
 
     vcl::timer_interval timer;
     gui_scene_structure gui_scene;
