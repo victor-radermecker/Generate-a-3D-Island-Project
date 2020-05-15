@@ -2,6 +2,7 @@
 
 #include "main/scene_base/base.hpp"
 #include "Environment.hpp"
+#include "vegetation.hpp"
 
 #ifdef SCENE_3D_GRAPHICS
 
@@ -28,6 +29,8 @@ struct scene_model : scene_base
     void set_gui();
 
     terrain_model env;
+    vegetation_model veg;
+
 
     vcl::timer_interval timer;
     gui_scene_structure gui_scene;

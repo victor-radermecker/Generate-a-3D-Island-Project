@@ -33,6 +33,8 @@ struct scene_model : scene_base
     vcl::mesh_drawable surface;
     GLuint texture_id;
 
+    vcl::mesh_drawable trunk;
+
     gui_scene_structure gui_scene;
 };
 

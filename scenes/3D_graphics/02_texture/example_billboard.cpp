@@ -26,6 +26,13 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& , 
 
     // Create a reference ground as a horizontal quadrangle
     ground = mesh_primitive_quad({-1,0,-1},{-1,0,1},{1,0,1},{1,0,-1});
+
+
+    // Let's draw a palm tree
+    trunk = mesh_primitive_cylinder()
+
+
+
 }
 
 

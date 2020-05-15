@@ -1,0 +1,22 @@
+#
+## Alias OBJ Material File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+
+newmtl leaf_front1
+Ka 0.000000 0.000000 0.000000
+Kd 0.388235 0.372549 0.125490
+Ks 0.330000 0.330000 0.330000
+map_Kd Palm_tall/leaf_front1.jpg
+
+newmtl archmodels85_018_1
+Ka 0.000000 0.000000 0.000000
+Kd 0.368627 0.313725 0.286275
+Ks 0.330000 0.330000 0.330000
+map_Kd Palm_tall/archmodels85_018_1.jpg
+
+newmtl archmodels85_018_2
+Ka 0.000000 0.000000 0.000000
+Kd 0.247059 0.211765 0.192157
+Ks 0.330000 0.330000 0.330000
+map_Kd Palm_tall/archmodels85_018_2.jpg
+
