@@ -25,12 +25,12 @@ out vec4 FragColor;
 uniform vec3 camera_position;
 uniform vec3 color     = vec3(0.99f, 0.83f, 0.50f);
 uniform float color_alpha = 1.0;
-uniform float ambiant  = 0.2;
+uniform float ambiant  = 0.8;
 uniform float diffuse  = 0.8;
 uniform float specular = 0.5;
 uniform int specular_exponent = 128;
 
-vec3 light = vec3(40.0f, 40.0f, 20.0f);
+vec3 light = vec3(150.0f, 150.0f, 100.0f);
 
 void main()
 {

@@ -99,6 +99,17 @@ void terrain_model::set_terrain()
     terrain[0].uniform.transform.scaling = 1.5f;
     terrain[0].uniform.transform.translation = { 0,0,-2.0f };
 
+    terrain[0].uniform.shading.ambiant = 0.6;
+    terrain[0].uniform.shading.diffuse = 0.7;
+    terrain[0].uniform.shading.specular = 0.4;
+    terrain[0].uniform.shading.specular_exponent = 64;
+
+    terrain[1].uniform.shading.ambiant = 0.6;
+    terrain[1].uniform.shading.diffuse = 0.8;
+    terrain[1].uniform.shading.specular = 0.4;
+    terrain[1].uniform.shading.specular_exponent = 64;
+
+
     texture_ids.sand_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/sand.png"));
     texture_ids.grass_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/grass-rock.png"));
     texture_ids.rock_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/volcano-rock.png"));
@@ -234,12 +245,12 @@ void terrain_model::set_ocean()
     ocean_connectivity = ocean_cpu.connectivity;
     ocean_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/ocean_texture.png"));
     ocean = ocean_cpu;
-    ocean.uniform.color = { 0.2f,0.5f,0.9f };
+    ocean.uniform.color = { 0.6f,1.0f,1.0f };
     ocean.uniform.transform.translation = { 0,0,1.0f };
 
     // Illumination parameters
-    ocean.uniform.shading.ambiant = 1.0f;
-    ocean.uniform.shading.diffuse = 0.3f;
+    ocean.uniform.shading.ambiant = 0.6f;
+    ocean.uniform.shading.diffuse = 0.4;
     ocean.uniform.shading.specular = 0.8f;
     ocean.uniform.shading.specular_exponent = 512;
 

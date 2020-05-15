@@ -62,11 +62,11 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glUseProgram(shaders["terrain"]);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, env.texture_ids.sand_id);
-    uniform(shaders["terrain"], "sand_sampler", 0); opengl_debug();
+    uniform(shaders["terrain"], "sand_sampler", 0);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
-    uniform(shaders["terrain"], "grass_sampler", 1); opengl_debug();
+    uniform(shaders["terrain"], "grass_sampler", 1);
 
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, env.texture_ids.rock_id);
