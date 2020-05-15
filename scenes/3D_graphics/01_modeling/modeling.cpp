@@ -32,6 +32,9 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
     // Create and initialise ocean
     env.set_ocean();
 
+    // Create skybox
+    skybox.set_skybox();
+
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
     scene.camera.scale = 10.0f;
@@ -53,6 +56,17 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     set_gui();
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
     glPolygonOffset(1.0, 1.0);
+
+    /**********************************/
+    //        Display ocean           //
+    /*********************************/
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, env.ocean_texture_id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+    env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
+    draw(env.ocean, scene.camera, shaders["mesh_sun"]);
 
 
     /**********************************************************/
@@ -88,20 +102,14 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
     uniform(shaders["terrain1"], "grass_sampler", 1); opengl_debug();
 
-
-    draw(env.terrain[1], scene.camera, shaders["terrain1"]);
     
+    draw(env.terrain[1], scene.camera, shaders["terrain1"]);
 
-    /**********************************/
-    //        Display ocean           //
-    /*********************************/
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, env.ocean_texture_id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    /**************************************/
+    /*         DISPLAY SKYBOX            */
+    /*************************************/
 
-    env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
-    draw(env.ocean, scene.camera, shaders["mesh_sun"]);
+    skybox.draw_skybox(shaders, scene);
     
 }
 

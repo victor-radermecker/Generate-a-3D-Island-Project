@@ -13,8 +13,6 @@ out struct fragment_data
     vec2 texture_uv;
 } fragment;
 
-//out vec4 position_fragment;
-//out vec4 normal_fragment;
 
 // model transformation
 uniform vec3 translation = vec3(0.0, 0.0, 0.0);                      // user defined translation
