@@ -41,6 +41,9 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
     scene.camera.scale = 10.0f;
     scene.camera.apply_rotation(0,0,0,1.2f);
 
+    // Setup skybox
+    skybox.set_skybox();
+
     // Timer parameters
     timer.t_max = 10.0f;
     timer.scale = 1.0f;
@@ -110,12 +113,6 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
     uniform(shaders["terrain1"], "grass_sampler", 1); opengl_debug();
 
-<<<<<<< HEAD
-=======
-    
-    draw(env.terrain[1], scene.camera, shaders["terrain1"]);
->>>>>>> b84978c574fe675c42ed9af5b9f579922e30cbbf
-    
     draw(env.terrain[1], scene.camera, shaders["terrain1"]);
 
     /**************************************/
