@@ -73,6 +73,11 @@ struct terrain_model
 	// Terrain textures
 	terrain_textures texture_ids;
 
+	// Display methods
+	void draw_terrain(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+	void draw_ocean(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+
+
 
 
 

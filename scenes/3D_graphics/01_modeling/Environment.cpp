@@ -30,7 +30,11 @@ mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 
             vec3 position = evaluate_terrain(u, v, type, p0);
             // Compute coordinates
             terrain.position[kv + N * ku] = position;
-            terrain.texture_uv[kv + N * ku] = { 15.0f * u , 15.0f * v  }; 
+            if(type == "volcano")
+                terrain.texture_uv[kv + N * ku] = { 15.0f * u , 15.0f * v  };
+            else
+                terrain.texture_uv[kv + N * ku] = { 30.0f * u, 30.0f * v };
+
             //terrain.color[kv + N * ku] = { c,c,c,1.0f };
         }
     }
@@ -101,12 +105,12 @@ void terrain_model::set_terrain()
 
     terrain[0].uniform.shading.ambiant = 0.6;
     terrain[0].uniform.shading.diffuse = 0.7;
-    terrain[0].uniform.shading.specular = 0.4;
+    terrain[0].uniform.shading.specular = 0.1;
     terrain[0].uniform.shading.specular_exponent = 64;
 
     terrain[1].uniform.shading.ambiant = 0.6;
     terrain[1].uniform.shading.diffuse = 0.8;
-    terrain[1].uniform.shading.specular = 0.4;
+    terrain[1].uniform.shading.specular = 0.1;
     terrain[1].uniform.shading.specular_exponent = 64;
 
 
@@ -275,7 +279,7 @@ vec3 terrain_model::evaluate_terrain_volcano(float u, float v)
     //set parameters for Perlin Noise
     const float scaling = 2.5;
     const int octave = 8;
-    const float persistency = 0.6;
+    const float persistency = 0.4;
     const float height = 0.5;
 
     // Evaluate Perlin noise
@@ -323,8 +327,8 @@ vec3 terrain_model::evaluate_terrain_sand(float u, float v)
 {
     //set parameters for Perlin Noise
     const float scaling = 2.5;
-    const int octave = 6;
-    const float persistency = 0.8;
+    const int octave = 8;
+    const float persistency = 0.6;
     const float height = 0.5;
     const float noise = perlin(scaling * u, scaling * v, octave, persistency);
 
@@ -384,10 +388,60 @@ void island_param::set_island_parameters(std::vector<vec2>& u0, std::vector<floa
     sigma.push_back(0.18f/n);
     sigma.push_back(0.22f/n);
     sigma.push_back(0.47f/n);
+}
+
+
+void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_structure& scene)
+{
+    glUseProgram(shaders["terrain"]);
+    glActiveTexture(GL_TEXTURE0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
+    uniform(shaders["terrain"], "sand_sampler", 0);
+
+    glActiveTexture(GL_TEXTURE1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.grass_id);
+    uniform(shaders["terrain"], "grass_sampler", 1);
+
+    glActiveTexture(GL_TEXTURE2);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.rock_id);
+    uniform(shaders["terrain"], "rock_sampler", 2);
 
 
 
+    draw(terrain[0], scene.camera, shaders["terrain"]);
 
+
+    glUseProgram(shaders["terrain1"]);
+    glActiveTexture(GL_TEXTURE0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
+    uniform(shaders["terrain1"], "sand_sampler", 0); opengl_debug();
+
+    glActiveTexture(GL_TEXTURE1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.grass_id);
+    uniform(shaders["terrain1"], "grass_sampler", 1); opengl_debug();
+
+    draw(terrain[1], scene.camera, shaders["terrain1"]);
+}
+
+
+void terrain_model::draw_ocean(std::map<std::string, GLuint>& shaders, scene_structure& scene)
+{
+    glActiveTexture(GL_TEXTURE0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glBindTexture(GL_TEXTURE_2D, ocean_texture_id);
+    draw(ocean, scene.camera, shaders["mesh_sun"]);
 
 }
 

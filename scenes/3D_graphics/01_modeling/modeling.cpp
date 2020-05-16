@@ -62,58 +62,33 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glPolygonOffset(1.0, 1.0);
 
     /**********************************/
-    //        Display ocean           //
+    //  Update and display ocean        //
     /*********************************/
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, env.ocean_texture_id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    
 
     env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
-    draw(env.ocean, scene.camera, shaders["mesh_sun"]);
-    draw(veg.palm_tree, scene.camera, shaders["terrain1"]);
+    env.draw_ocean(shaders, scene);
 
+    
+    /********************************/
+    /*     DISPLAY TREES           */
+    /******************************/
+
+
+    draw(veg.palm_tree, scene.camera, shaders["terrain1"]);
+    
     for (int i = 0; i < veg.tree_position.size();i++) {
         vec3 pos = veg.tree_position[i];
         veg.palm_tree.uniform.transform.translation = pos;
         draw(veg.palm_tree, scene.camera, shaders["terrain1"]);
     }
-
+    
 
     /**********************************************************/
     /********************* DISPLAY TERRAIN ********************/
     /**********************************************************/
     
-    glUseProgram(shaders["terrain"]);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, env.texture_ids.sand_id);
-    uniform(shaders["terrain"], "sand_sampler", 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
-    uniform(shaders["terrain"], "grass_sampler", 1);
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, env.texture_ids.rock_id);
-    uniform(shaders["terrain"], "rock_sampler", 2); 
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-
-
-    draw(env.terrain[0], scene.camera, shaders["terrain"]);
-
-
-    glUseProgram(shaders["terrain1"]);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, env.texture_ids.sand_id);
-    uniform(shaders["terrain1"], "sand_sampler", 0); opengl_debug();
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, env.texture_ids.grass_id);
-    uniform(shaders["terrain1"], "grass_sampler", 1); opengl_debug();
-
-    draw(env.terrain[1], scene.camera, shaders["terrain1"]);
+    env.draw_terrain(shaders, scene);
 
     /**************************************/
     /*         DISPLAY SKYBOX            */
