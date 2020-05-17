@@ -11,7 +11,7 @@ struct vegetation_model
 
 
 
-	//Rock generation
+	//tree generation
 	std::vector<vcl::vec3> tree_position;
 	terrain_model env;
 

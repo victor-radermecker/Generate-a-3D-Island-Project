@@ -2,7 +2,7 @@
 
 #include "main/scene_base/base.hpp"
 #include "Environment.hpp"
-#include "vegetation.hpp"
+#include "Environment_Object.hpp"
 #include "Skybox.hpp"
 
 #ifdef SCENE_3D_GRAPHICS
@@ -31,7 +31,7 @@ struct scene_model : scene_base
 
     // Ocean + terrain
     terrain_model env;
-    vegetation_model veg;
+    object_model objects;
 
 
     // Skybox

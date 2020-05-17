@@ -32,9 +32,13 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
     env.set_ocean();
 
     //create first palm tree
-    veg.set_palm_tree();
-    veg.init_forest(10, veg.tree_position, 4.0f, 0.05f, "volcano");
+    objects.set_palm_tree();
+    objects.set_rock1();
+    objects.set_rock2();
 
+    objects.init_trees(10, 4.0f, 0.05f, "volcano");
+    objects.init_rocks1(10, 4.0f, 0.0f, "volcano");
+    objects.init_rocks2(10, 4.0f, 0.00f, "volcano");
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
@@ -61,28 +65,19 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
     glPolygonOffset(1.0, 1.0);
 
+       
+    /********************************/
+    /*     DISPLAY ENV OBJECTS     */
+    /******************************/
+    objects.draw_all(shaders, scene);
+
+
     /**********************************/
     //  Update and display ocean        //
     /*********************************/
-    
-
     env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
     env.draw_ocean(shaders, scene);
 
-    
-    /********************************/
-    /*     DISPLAY TREES           */
-    /******************************/
-
-
-    draw(veg.palm_tree, scene.camera, shaders["terrain1"]);
-    
-    for (int i = 0; i < veg.tree_position.size();i++) {
-        vec3 pos = veg.tree_position[i];
-        veg.palm_tree.uniform.transform.translation = pos;
-        draw(veg.palm_tree, scene.camera, shaders["terrain1"]);
-    }
-    
 
     /**********************************************************/
     /********************* DISPLAY TERRAIN ********************/

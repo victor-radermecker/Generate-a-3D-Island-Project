@@ -64,7 +64,7 @@ vec3 terrain_model::evaluate_terrain(float u, float v, std::string type = "None"
     vec3 p = { 0,0,0 };
     
     if (type == "volcano") {
-        p = evaluate_terrain_volcano(u, v) ;
+        p = evaluate_terrain_volcano(u, v);
     }
     else if (type == "sand") {
         p = evaluate_terrain_sand(u, v);
@@ -100,8 +100,6 @@ void terrain_model::set_terrain()
     terrain.push_back(create_terrain("volcano", { 0,0,0 }));
     terrain.push_back(create_terrain("sand", { 0,0,0 }));
     terrain[0].uniform.color = { 1.0f, 1.0f, 1.0f };
-    terrain[0].uniform.transform.scaling = 1.5f;
-    terrain[0].uniform.transform.translation = { 0,0,-2.0f };
 
     terrain[0].uniform.shading.ambiant = 0.6;
     terrain[0].uniform.shading.diffuse = 0.7;
@@ -290,7 +288,7 @@ vec3 terrain_model::evaluate_terrain_volcano(float u, float v)
     float y = 60 * (v - 0.5f);
     float z = evaluate_terrain_z_volcano(u, v);
     z *= 1 + c * std::exp(-z / 10);
-    return { x,y,z };
+    return  1.5f * vec3( x,y,z ) - vec3(0,0,2.0f);
 }
 
 float terrain_model::evaluate_terrain_z_volcano(float u, float v)
@@ -422,13 +420,13 @@ void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_s
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
-    uniform(shaders["terrain1"], "sand_sampler", 0); opengl_debug();
+    uniform(shaders["terrain1"], "sand_sampler", 0);
 
     glActiveTexture(GL_TEXTURE1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glBindTexture(GL_TEXTURE_2D, texture_ids.grass_id);
-    uniform(shaders["terrain1"], "grass_sampler", 1); opengl_debug();
+    uniform(shaders["terrain1"], "grass_sampler", 1);
 
     draw(terrain[1], scene.camera, shaders["terrain1"]);
 }
@@ -436,11 +434,12 @@ void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_s
 
 void terrain_model::draw_ocean(std::map<std::string, GLuint>& shaders, scene_structure& scene)
 {
+    glUseProgram(shaders["mesh_sun"]);
     glActiveTexture(GL_TEXTURE0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
     glBindTexture(GL_TEXTURE_2D, ocean_texture_id);
+
     draw(ocean, scene.camera, shaders["mesh_sun"]);
 
 }
