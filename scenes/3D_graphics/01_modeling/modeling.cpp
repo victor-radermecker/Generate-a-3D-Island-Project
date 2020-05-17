@@ -32,13 +32,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
     env.set_ocean();
 
     //create first palm tree
-    objects.set_palm_tree();
-    objects.set_rock1();
-    objects.set_rock2();
-
-    objects.init_trees(10, 4.0f, 0.05f, "volcano");
-    objects.init_rocks1(10, 4.0f, 0.0f, "volcano");
-    objects.init_rocks2(10, 4.0f, 0.00f, "volcano");
+    objects.set_and_init_all(env);
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;

@@ -26,7 +26,7 @@ mesh object_model::create_rock2()
 void object_model::set_rock2()
 {
 	rock2 = create_rock2();
-	rock2.uniform.transform.scaling = 0.002f;
+	rock2.uniform.transform.scaling = 0.005f;
 	rock2.uniform.transform.rotation = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.5f);
 	rock2_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/rocks/Stone5ok17Diff.png"));
 
@@ -49,35 +49,39 @@ void object_model::set_palm_tree()
 
 
 
-void object_model::init_objects(int N, std::vector<vcl::vec3>& list_position, float min_dist, float z_offset_down, std::string terrain_type)
+void object_model::init_objects(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env)
 {
-	update_random_position(N, list_position, min_dist, z_offset_down, terrain_type);
+	update_random_position(N, list_position, min_dist, max_dist, min_height, z_offset_down, terrain_type, env);
 }
-void object_model::update_random_position(int N, std::vector<vcl::vec3>& list_position, float min_dist, float z_offset_down, std::string terrain_type)
+void object_model::update_random_position(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env)
 {
-	//N is the number of trees
-	while (list_position.size() < N) {
-		float u = ((double)rand() / (RAND_MAX));
-		float v = ((double)rand() / (RAND_MAX));
+	//N is the total number of trees to place, i is the number currently places
+	int i = 0;
+	while (i < N) {
+		float u = (float)rand() / (float)RAND_MAX;
+		float v = (float)rand() / (float)RAND_MAX;
+
 		vec3 pos = env.evaluate_terrain(u, v, terrain_type, vec3(0, 0, 0));
-		if (acceptablePosition(pos, list_position, min_dist)) {
+		if (acceptablePosition(pos, list_position, min_dist, max_dist, min_height)) {
 			list_position.push_back(pos - vec3(0, 0, z_offset_down));
+			++i;
 		}
 	}
 }
-bool object_model::acceptablePosition(vcl::vec3 pos, std::vector<vcl::vec3> list_position, float min_dist)
+bool object_model::acceptablePosition(vcl::vec3 pos, std::vector<vcl::vec3> list_position, float min_dist, float max_dist, float min_height)
 {
-	for (vec3 tree : list_position) {
-		float dist = 0;
-		float radius = 0;
-		for (int i = 0; i < 2; i++) {
-			dist += (pos[i] - tree[i]) * (pos[i] - tree[i]);
-			radius += pos[i] * pos[i];
-			std::cout << radius << std::endl;
-		}
-		dist = pow(dist, 0.5);
-		if (dist < min_dist || radius < 4.0f) {
-			std::cout << "NO" << std::endl;
+	// Verify if the object is not to far/close to center, or too low (in the water)
+	vec2 pos_xy = vec2(pos.x, pos.y);
+	float dist = norm(pos_xy);
+	if (dist < min_dist || dist > max_dist || pos.z < min_height)
+		return false;
+
+	// Verify if it is not too close to other objects
+	for (vec3 object_pos : list_position) {
+		vec2 obj_xy = vec2(object_pos.x, object_pos.y);
+		float dist_to_others = norm(pos_xy - obj_xy);
+
+		if (dist_to_others < 2.0f) {
 			return false;
 		}
 	}
@@ -85,19 +89,50 @@ bool object_model::acceptablePosition(vcl::vec3 pos, std::vector<vcl::vec3> list
 }
 
 
-void object_model::init_rocks1(int N, float min_dist, float z_offset_down, std::string terrain_type)
+void object_model::init_rocks1(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env)
 {
-	init_objects(N, list_position_rock1, min_dist, z_offset_down, terrain_type);
+	init_objects(N, list_position_rock1, min_dist, max_dist, min_height, z_offset_down, terrain_type, env);
+
+	mat3 base_rot = rotation_from_axis_angle_mat3(vec3(1, 1.2f, 0.5f), 1.5f);
+	for (int i = 0; i < N; i++)
+		rock1_rotations.push_back(rotation_from_axis_angle_mat3(vec3(0, 0, 1), rand_interval(0, 6.18f)) * base_rot);
+
 }
 
-void object_model::init_rocks2(int N, float min_dist, float z_offset_down, std::string terrain_type)
+void object_model::init_rocks2(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env)
 {
-	init_objects(N, list_position_rock2, min_dist, z_offset_down, terrain_type);
+	init_objects(N, list_position_rock2, min_dist, max_dist, min_height, z_offset_down, terrain_type, env);
+	mat3 base_rot = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.5f);
+	for (int i = 0; i < N; i++)
+		rock2_rotations.push_back(rotation_from_axis_angle_mat3(vec3(0, 0, 1), rand_interval(0, 6.18f)) * base_rot);
+
 }
 
-void object_model::init_trees(int N, float min_dist, float z_offset_down, std::string terrain_type)
+void object_model::init_trees(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env)
 {
-	init_objects(N, tree_position, min_dist, z_offset_down, terrain_type);
+	init_objects(N, tree_position, min_dist, max_dist, min_height, z_offset_down, terrain_type, env);
+
+	mat3 base_rot = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.5f);
+	for(int i = 0; i < N; i++)
+		tree_rotations.push_back(rotation_from_axis_angle_mat3(vec3(0, 0, 1), rand_interval(0, 6.18f)) * base_rot);
+
+}
+
+void object_model::set_and_init_all(terrain_model& env)
+{
+	set_palm_tree();
+	set_rock1();
+	set_rock2();
+
+	init_trees(20, 13.0f, 30.0f, 2.0f, 1.5f, "volcano", env);
+	init_rocks1(1, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
+	init_rocks2(2, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
+
+	init_trees(5, 0.0f, 300.0f, 6.0f, 2.0f, "sand", env);
+	init_rocks1(2, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
+	init_rocks2(3, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
+	
+
 }
 
 void object_model::draw_rock1(std::map<std::string, GLuint>& shaders, scene_structure& scene)
@@ -110,6 +145,8 @@ void object_model::draw_rock1(std::map<std::string, GLuint>& shaders, scene_stru
 
 	for (int i = 0; i < list_position_rock1.size(); i++) {
 		vec3 pos = list_position_rock1[i];
+		rock1.uniform.transform.rotation = rock1_rotations[i];
+
 		rock1.uniform.transform.translation = pos;
 		draw(rock1, scene.camera, shaders["mesh_sun"]);
 	}
@@ -125,6 +162,7 @@ void object_model::draw_rock2(std::map<std::string, GLuint>& shaders, scene_stru
 
 	for (int i = 0; i < list_position_rock2.size(); i++) {
 		vec3 pos = list_position_rock2[i];
+		rock2.uniform.transform.rotation = rock2_rotations[i];
 		rock2.uniform.transform.translation = pos;
 		draw(rock2, scene.camera, shaders["mesh_sun"]);
 	}
@@ -140,6 +178,7 @@ void object_model::draw_tree(std::map<std::string, GLuint>& shaders, scene_struc
 
 	for (int i = 0; i < tree_position.size(); i++) {
 		vec3 pos = tree_position[i];
+		palm_tree.uniform.transform.rotation = tree_rotations[i];
 		palm_tree.uniform.transform.translation = pos;
 		draw(palm_tree, scene.camera, shaders["mesh_sun"]);
 	}
