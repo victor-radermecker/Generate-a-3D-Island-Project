@@ -85,6 +85,11 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 
     skybox.draw_skybox(shaders, scene);
     
+    /******************************/
+    /*      BILLBOARDS            */
+    /******************************/
+
+    objects.draw_billboards(shaders, scene, objects.Identity3, objects.Rotation);
 }
 
 void scene_model::set_gui()

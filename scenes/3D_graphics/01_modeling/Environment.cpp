@@ -393,21 +393,21 @@ void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_s
 {
     glUseProgram(shaders["terrain"]);
     glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
     uniform(shaders["terrain"], "sand_sampler", 0);
 
     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.grass_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glBindTexture(GL_TEXTURE_2D, texture_ids.grass_id);
     uniform(shaders["terrain"], "grass_sampler", 1);
 
     glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.rock_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glBindTexture(GL_TEXTURE_2D, texture_ids.rock_id);
     uniform(shaders["terrain"], "rock_sampler", 2);
 
 
@@ -417,15 +417,15 @@ void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_s
 
     glUseProgram(shaders["terrain1"]);
     glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
     uniform(shaders["terrain1"], "sand_sampler", 0);
 
     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture_ids.grass_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glBindTexture(GL_TEXTURE_2D, texture_ids.grass_id);
     uniform(shaders["terrain1"], "grass_sampler", 1);
 
     draw(terrain[1], scene.camera, shaders["terrain1"]);
@@ -436,9 +436,9 @@ void terrain_model::draw_ocean(std::map<std::string, GLuint>& shaders, scene_str
 {
     glUseProgram(shaders["mesh_sun"]);
     glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, ocean_texture_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glBindTexture(GL_TEXTURE_2D, ocean_texture_id);
 
     draw(ocean, scene.camera, shaders["mesh_sun"]);
 

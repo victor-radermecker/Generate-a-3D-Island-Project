@@ -39,22 +39,49 @@ struct object_model
 
 
 
+	/**************/
+	// Billboards //
+	/**************/
+	std::vector<vcl::vec3> billboard_positions;
+	int N_grass;
+	int N_flower1;
+	int N_flower2;
+	int N_flower3;
+
+	GLuint grass_texture_id;
+	GLuint flower1_texture_id;
+	GLuint flower2_texture_id;
+	GLuint flower3_texture_id;
+
+	vcl::mesh create_billboard();
+	void set_billboards();
+	vcl::mesh_drawable billboard;
+	vcl::mat3 Identity3;
+	vcl::mat3 Rotation;
+
+
+
+
 	// Objects initialisation
-	void init_objects(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
-	void update_random_position(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
-	bool acceptablePosition(vcl::vec3 pos, std::vector<vcl::vec3> list_position, float min_dist, float max_dist, float min_height);
+	void init_objects(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, bool billboard,  terrain_model& env);
+	void update_random_position(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, bool billboard, terrain_model& env);
+	bool acceptablePosition(vcl::vec3 pos, std::vector<vcl::vec3> list_position, float min_dist, float max_dist, float min_height, bool billboard);
 
 
 	void init_rocks1(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
 	void init_rocks2(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
 	void init_trees(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
+	void init_billboards(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
 
 	void set_and_init_all(terrain_model& env);
+
 
 
 	/*      DRAWING METHODS          */
 	void draw_rock1(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void draw_rock2(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void draw_tree(std::map<std::string, GLuint>& shaders, scene_structure& scene);
-	void draw_all(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+	void draw_all(std::map<std::string, GLuint>& shaders, scene_structure& scene);  // Does not draw billboards !
+
+	void draw_billboards(std::map<std::string, GLuint>& shaders, scene_structure& scene, vcl::mat3& Identity, vcl::mat3& R);
 };
