@@ -76,6 +76,7 @@ void object_model::init_objects(int N, std::vector<vcl::vec3>& list_position, fl
 {
 	update_random_position(N, list_position, min_dist, max_dist, min_height, z_offset_down, terrain_type, is_billboard, env);
 }
+
 void object_model::update_random_position(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, bool is_billboard, terrain_model& env)
 {
 	//N is the total number of trees to place, i is the number currently places
@@ -154,7 +155,7 @@ void object_model::set_and_init_all(terrain_model& env)
 	set_palm_tree();
 	set_rock1();
 	set_rock2();
-	set_billboards();
+	//set_billboards();
 
 	init_trees(20, 13.0f, 30.0f, 2.0f, 1.5f, "volcano", env);
 	init_rocks1(1, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
@@ -164,7 +165,7 @@ void object_model::set_and_init_all(terrain_model& env)
 	init_rocks1(2, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
 	init_rocks2(3, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
 	
-	init_billboards(N_grass + N_flower1 + N_flower2 + N_flower3, 0.0f, 300.0f, 10.0f, 0.5f, "sand", env);
+	//init_billboards(N_grass + N_flower1 + N_flower2 + N_flower3, 0.0f, 300.0f, 10.0f, 0.5f, "sand", env);
 }
 
 void object_model::draw_rock1(std::map<std::string, GLuint>& shaders, scene_structure& scene)
@@ -219,6 +220,7 @@ void object_model::draw_all(std::map<std::string, GLuint>& shaders, scene_struct
 	draw_rock1(shaders, scene);
 	draw_rock2(shaders, scene);
 	draw_tree(shaders, scene);
+	//draw_billboards(shaders, scene, Identity3, Rotation);
 }
 
 

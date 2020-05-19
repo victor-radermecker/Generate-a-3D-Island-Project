@@ -34,6 +34,10 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
     //create first palm tree
     objects.set_and_init_all(env);
 
+    //setting lava in volcano
+    lava.set_lava();
+    lava.create_particule();
+
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
     scene.camera.scale = 10.0f;
@@ -63,38 +67,67 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     /********************************/
     /*     DISPLAY ENV OBJECTS     */
     /******************************/
-    objects.draw_all(shaders, scene);
+    if (gui_scene.trees) {
+        objects.draw_all(shaders, scene);
+    }
 
 
     /**********************************/
     //  Update and display ocean        //
     /*********************************/
-    env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
-    env.draw_ocean(shaders, scene);
+    if (gui_scene.ocean) {
+        env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
+        env.draw_ocean(shaders, scene);
+    }
 
 
     /**********************************************************/
     /********************* DISPLAY TERRAIN ********************/
     /**********************************************************/
-    
-    env.draw_terrain(shaders, scene);
+    if (gui_scene.terrain) {
+        env.draw_terrain(shaders, scene);
+    }
 
     /**************************************/
     /*         DISPLAY SKYBOX            */
     /*************************************/
+    if (gui_scene.skybox) {
+        skybox.draw_skybox(shaders, scene);
+    }
 
-    skybox.draw_skybox(shaders, scene);
+    /**************************************/
+    /*         DISPLAY PARTICLES          */
+    /*************************************/
+    if (gui_scene.particles) {
+        lava.update_particles();
+        lava.draw_particles(shaders, scene);
+        lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
+        lava.draw_lava(shaders, scene);
+
+    }
+
     
     /******************************/
     /*      BILLBOARDS            */
     /******************************/
-
-    objects.draw_billboards(shaders, scene, objects.Identity3, objects.Rotation);
-}
+    
+    if (gui_scene.billboards) {
+        objects.draw_billboards(shaders, scene, objects.Identity3, objects.Rotation);
+    }
+    
+ }
 
 void scene_model::set_gui()
 {
-    ImGui::Checkbox("Wireframe", &gui_scene.wireframe);
+    ImGui::Checkbox("Terrain", &gui_scene.terrain);
+    ImGui::Checkbox("Ocean", &gui_scene.ocean);
+    ImGui::Checkbox("Trees", &gui_scene.trees);
+    ImGui::Checkbox("Skybox", &gui_scene.skybox);
+    ImGui::Checkbox("Billboards", &gui_scene.billboards);
+    ImGui::Checkbox("Particles", &gui_scene.particles);
+
+
+
     ImGui::Spacing();
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
     ImGui::SliderFloat("Time scale", &timer.scale, 0.1f, 3.0f);

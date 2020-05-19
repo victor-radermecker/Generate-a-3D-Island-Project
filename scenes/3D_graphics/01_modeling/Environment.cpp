@@ -16,7 +16,7 @@ using namespace vcl;
 mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 })
 {
     // Number of samples of the terrain is N x N
-    const size_t N = 600;
+    const size_t N = 300;
     mesh terrain; // temporary terrain storage (CPU only)
     terrain.position.resize(N * N);
     terrain.texture_uv.resize(N * N); //Initalize buffer for textures

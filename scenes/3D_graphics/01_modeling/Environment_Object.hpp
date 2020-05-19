@@ -81,7 +81,7 @@ struct object_model
 	void draw_rock1(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void draw_rock2(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void draw_tree(std::map<std::string, GLuint>& shaders, scene_structure& scene);
-	void draw_all(std::map<std::string, GLuint>& shaders, scene_structure& scene);  // Does not draw billboards !
+	void draw_all(std::map<std::string, GLuint>& shaders, scene_structure& scene);  
 
 	void draw_billboards(std::map<std::string, GLuint>& shaders, scene_structure& scene, vcl::mat3& Identity, vcl::mat3& R);
 };
