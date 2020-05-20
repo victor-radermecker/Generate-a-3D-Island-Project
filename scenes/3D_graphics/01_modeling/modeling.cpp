@@ -63,7 +63,11 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
     glPolygonOffset(1.0, 1.0);
 
-       
+
+
+    /********************************/
+    /*         DISPLAY FAUNA       */
+    /******************************/
     /********************************/
     /*     DISPLAY ENV OBJECTS     */
     /******************************/
@@ -99,10 +103,10 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     /*         DISPLAY PARTICLES          */
     /*************************************/
     if (gui_scene.particles) {
-        lava.update_particles();
-        lava.draw_particles(shaders, scene);
-        lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
-        lava.draw_lava(shaders, scene);
+        //lava.update_particles();
+        //lava.draw_particles(shaders, scene);
+        //lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
+        //lava.draw_lava(shaders, scene);
 
     }
 
@@ -116,6 +120,18 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     }
     
  }
+/*
+void scene_model::mouse_click(scene_structure& scene, GLFWwindow* window, int x, int y, int z)
+{
+    fauna.mouse_click(scene, window, x, y, z);
+}
+
+void scene_model::mouse_move(scene_structure& scene, GLFWwindow* window)
+{
+    fauna.mouse_move(scene, window);
+}*/
+
+
 
 void scene_model::set_gui()
 {
@@ -125,12 +141,27 @@ void scene_model::set_gui()
     ImGui::Checkbox("Skybox", &gui_scene.skybox);
     ImGui::Checkbox("Billboards", &gui_scene.billboards);
     ImGui::Checkbox("Particles", &gui_scene.particles);
-
+    ImGui::Checkbox("Fauna", &gui_scene.fauna);
+    ImGui::Checkbox("Keyframes", &gui_scene.keyframes);
 
 
     ImGui::Spacing();
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
     ImGui::SliderFloat("Time scale", &timer.scale, 0.1f, 3.0f);
+
+    /*
+    if (ImGui::Button("Print Keyframe"))
+    {
+        std::cout << "keyframe_position={";
+        for (size_t k = 0; k < fauna.keyframes.size(); ++k)
+        {
+            const vec3& p = fauna.keyframes[k].p;
+            std::cout << "{" << p.x << "f," << p.y << "f," << p.z << "f}";
+            if (k < fauna.keyframes.size() - 1)
+                std::cout << ", ";
+        }
+        std::cout << "}" << std::endl;
+    }*/
 
 }
 

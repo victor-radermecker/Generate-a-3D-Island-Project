@@ -5,6 +5,7 @@
 #include "Environment_Object.hpp"
 #include "Skybox.hpp"
 #include "Lava.hpp"
+//#include "Fauna.hpp"
 
 #ifdef SCENE_3D_GRAPHICS
 
@@ -18,16 +19,10 @@ struct gui_scene_structure
     bool billboards = false;
     bool terrain = true;
     bool particles = true;
+    bool fauna = true;
+    bool keyframes = false;
 };
 
-/*
-struct perlin_noise
-{
-    float scaling;
-    int octave;
-    float persistency;
-    float height;
-};*/
 
 struct scene_model : scene_base
 {
@@ -41,13 +36,19 @@ struct scene_model : scene_base
     terrain_model env;
     object_model objects;
     lava_model lava;
-
-
-    // Skybox
     skybox_model skybox;
+    //fauna_model fauna;
+
+
+
+
     vcl::timer_interval timer;
     gui_scene_structure gui_scene;
     gui_scene_structure ocean;
+
+
+    void mouse_click(scene_structure& scene, GLFWwindow* window, int button, int action, int mods);
+    void mouse_move(scene_structure& scene, GLFWwindow* window);
 
 
 };

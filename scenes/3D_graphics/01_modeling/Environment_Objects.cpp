@@ -155,7 +155,7 @@ void object_model::set_and_init_all(terrain_model& env)
 	set_palm_tree();
 	set_rock1();
 	set_rock2();
-	//set_billboards();
+	set_billboards();
 
 	init_trees(20, 13.0f, 30.0f, 2.0f, 1.5f, "volcano", env);
 	init_rocks1(1, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
@@ -165,7 +165,7 @@ void object_model::set_and_init_all(terrain_model& env)
 	init_rocks1(2, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
 	init_rocks2(3, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
 	
-	//init_billboards(N_grass + N_flower1 + N_flower2 + N_flower3, 0.0f, 300.0f, 10.0f, 0.5f, "sand", env);
+	init_billboards(N_grass + N_flower1 + N_flower2 + N_flower3, 0.0f, 300.0f, 10.0f, 0.5f, "sand", env);
 }
 
 void object_model::draw_rock1(std::map<std::string, GLuint>& shaders, scene_structure& scene)
@@ -227,6 +227,9 @@ void object_model::draw_all(std::map<std::string, GLuint>& shaders, scene_struct
 void object_model::draw_billboards(std::map<std::string, GLuint>& shaders, scene_structure& scene, mat3& Identity, mat3& R)
 {
 	// Prepare for displaying transparent elements
+	glUseProgram(shaders["mesh_sun"]);
+	glActiveTexture(GL_TEXTURE0);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(false);
