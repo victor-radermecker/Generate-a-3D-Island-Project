@@ -24,7 +24,7 @@ mesh create_terrain();
 
 /** This function is called before the beginning of the animation loop
     It is used to initialize all part-specific data */
-void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& scene, gui_structure& )
+void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_structure& scene, gui_structure& )
 {
     // Create and initialise terrain surface
     env.set_terrain();
@@ -36,7 +36,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
 
     //setting lava in volcano
     lava.set_lava();
-    lava.create_particule();
+    lava.create_particule(shaders, scene);
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;

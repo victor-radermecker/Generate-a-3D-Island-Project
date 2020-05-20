@@ -11,6 +11,18 @@ struct particle_structure
 };
 
 
+struct fire_particle_structure
+{
+	vcl::vec3 p; // Position
+	vcl::vec3 v; // Speed
+	float scale; // scale 
+	bool activated = false;
+	float theta = 0;
+	//std::vector<vcl::mat3> rotation = vcl::rotation_from_axis_angle_mat3(vec3(0, 0, 1), 1.57f);
+
+};
+
+
 
 
 struct lava_model
@@ -35,16 +47,43 @@ struct lava_model
 	
 	//particle functions
 
-	void create_particule();
+	void create_particule(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void update_particles();
 	void draw_particles(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+	void init_objects();
+	void update_smoke(bool is_new_particle, float dt);
+	void update_fire_particle(float dt);
+	void update_fire_cloud(bool is_new_particle, float dt);
+
 
 
 	vcl::mesh_drawable particle; // Visual representation of a particle - a sphere
-	vcl::mesh_drawable particle_fire;
+	vcl::mesh_drawable fire_sphere;
 	vcl::timer_event timer;
 	std::list<particle_structure> particles; //storing all particles
-	std::list<particle_structure> particles_fire; //storing all particles
+	fire_particle_structure fire_particle;
+	std::list<particle_structure> fire_particles; //storing all particles
+
+	//sprite for smoke
+	vcl::mesh_drawable sprite_smoke;
+	void init_smoke(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+
+	//Fire cloud
+	vcl::mesh_drawable sprite_fire;
+	void init_fire(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+
+
+	//rock
+	vcl::mesh_drawable rock;
+	GLuint rock_texture_id;
+	vcl::mat3 random_rotation;
+	void set_rock_rotation();
+
+
+	vcl::mesh create_rock();
+	void set_rock();
+	void lava_model::draw_rock(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+
 
 };
 
