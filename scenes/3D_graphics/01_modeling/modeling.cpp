@@ -24,7 +24,7 @@ mesh create_terrain();
 
 /** This function is called before the beginning of the animation loop
     It is used to initialize all part-specific data */
-void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& scene, gui_structure& )
+void scene_model::setup_data(std::map<std::string,GLuint>& shaders, scene_structure& scene, gui_structure& )
 {
     // Create and initialise terrain surface
     env.set_terrain();
@@ -36,7 +36,11 @@ void scene_model::setup_data(std::map<std::string,GLuint>& , scene_structure& sc
 
     //setting lava in volcano
     lava.set_lava();
-    lava.create_particule();
+    lava.create_particule(shaders, scene);;
+
+    //Faune
+    fauna.set_keyframes();
+    fauna.setup_bird();
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
@@ -63,6 +67,18 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
     glPolygonOffset(1.0, 1.0);
 
+
+
+    /********************************/
+    /*         DISPLAY FAUNA       */
+    /******************************/
+    if (gui_scene.fauna)
+    {
+        fauna.update_bird();
+        fauna.draw_bird(shaders, scene);
+        if (gui_scene.keyframes)
+            fauna.draw_keyframes(shaders, scene);
+    }
        
     /********************************/
     /*     DISPLAY ENV OBJECTS     */
@@ -99,10 +115,10 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     /*         DISPLAY PARTICLES          */
     /*************************************/
     if (gui_scene.particles) {
-        lava.update_particles();
-        lava.draw_particles(shaders, scene);
-        lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
-        lava.draw_lava(shaders, scene);
+        //lava.update_particles();
+        //lava.draw_particles(shaders, scene);
+        //lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
+        //lava.draw_lava(shaders, scene);
 
     }
 
@@ -117,6 +133,18 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     
  }
 
+void scene_model::mouse_click(scene_structure& scene, GLFWwindow* window, int x, int y, int z)
+{
+    fauna.mouse_click(scene, window, x, y, z);
+}
+
+void scene_model::mouse_move(scene_structure& scene, GLFWwindow* window)
+{
+    fauna.mouse_move(scene, window);
+}
+
+
+
 void scene_model::set_gui()
 {
     ImGui::Checkbox("Terrain", &gui_scene.terrain);
@@ -125,12 +153,26 @@ void scene_model::set_gui()
     ImGui::Checkbox("Skybox", &gui_scene.skybox);
     ImGui::Checkbox("Billboards", &gui_scene.billboards);
     ImGui::Checkbox("Particles", &gui_scene.particles);
-
+    ImGui::Checkbox("Fauna", &gui_scene.fauna);
+    ImGui::Checkbox("Keyframes", &gui_scene.keyframes);
 
 
     ImGui::Spacing();
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
     ImGui::SliderFloat("Time scale", &timer.scale, 0.1f, 3.0f);
+
+    if (ImGui::Button("Print Keyframe"))
+    {
+        std::cout << "keyframe_position={";
+        for (size_t k = 0; k < fauna.keyframes.size(); ++k)
+        {
+            const vec3& p = fauna.keyframes[k].p;
+            std::cout << "{" << p.x << "f," << p.y << "f," << p.z << "f}";
+            if (k < fauna.keyframes.size() - 1)
+                std::cout << ", ";
+        }
+        std::cout << "}" << std::endl;
+    }
 
 }
 
