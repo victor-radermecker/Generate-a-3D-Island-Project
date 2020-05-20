@@ -26,6 +26,11 @@ mesh create_terrain();
     It is used to initialize all part-specific data */
 void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_structure& scene, gui_structure& )
 {
+
+    // Create fauna
+    fauna.setup_bird();
+    fauna.set_keyframes();
+
     // Create and initialise terrain surface
     env.set_terrain();
     // Create and initialise ocean
@@ -68,6 +73,14 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     /********************************/
     /*         DISPLAY FAUNA       */
     /******************************/
+
+    if (gui_scene.fauna) {
+        fauna.update_bird();
+        fauna.draw_bird(shaders, scene);
+        if (gui_scene.keyframes)
+            fauna.draw_keyframes(shaders, scene);
+    }
+
     /********************************/
     /*     DISPLAY ENV OBJECTS     */
     /******************************/
@@ -103,10 +116,10 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     /*         DISPLAY PARTICLES          */
     /*************************************/
     if (gui_scene.particles) {
-        //lava.update_particles();
-        //lava.draw_particles(shaders, scene);
-        //lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
-        //lava.draw_lava(shaders, scene);
+        lava.update_particles();
+        lava.draw_particles(shaders, scene);
+        lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
+        lava.draw_lava(shaders, scene);
 
     }
 
@@ -120,7 +133,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     }
     
  }
-/*
+
 void scene_model::mouse_click(scene_structure& scene, GLFWwindow* window, int x, int y, int z)
 {
     fauna.mouse_click(scene, window, x, y, z);
@@ -129,7 +142,7 @@ void scene_model::mouse_click(scene_structure& scene, GLFWwindow* window, int x,
 void scene_model::mouse_move(scene_structure& scene, GLFWwindow* window)
 {
     fauna.mouse_move(scene, window);
-}*/
+}
 
 
 
@@ -149,20 +162,7 @@ void scene_model::set_gui()
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
     ImGui::SliderFloat("Time scale", &timer.scale, 0.1f, 3.0f);
 
-    /*
-    if (ImGui::Button("Print Keyframe"))
-    {
-        std::cout << "keyframe_position={";
-        for (size_t k = 0; k < fauna.keyframes.size(); ++k)
-        {
-            const vec3& p = fauna.keyframes[k].p;
-            std::cout << "{" << p.x << "f," << p.y << "f," << p.z << "f}";
-            if (k < fauna.keyframes.size() - 1)
-                std::cout << ", ";
-        }
-        std::cout << "}" << std::endl;
-    }*/
-
+   
 }
 
 

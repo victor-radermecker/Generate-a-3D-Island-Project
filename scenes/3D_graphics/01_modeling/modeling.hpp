@@ -5,7 +5,7 @@
 #include "Environment_Object.hpp"
 #include "Skybox.hpp"
 #include "Lava.hpp"
-//#include "Fauna.hpp"
+#include "Fauna.hpp"
 
 #ifdef SCENE_3D_GRAPHICS
 
@@ -37,7 +37,7 @@ struct scene_model : scene_base
     object_model objects;
     lava_model lava;
     skybox_model skybox;
-    //fauna_model fauna;
+    fauna_model fauna;
 
 
 
