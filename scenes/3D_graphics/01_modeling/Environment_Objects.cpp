@@ -153,6 +153,8 @@ void object_model::init_billboards(int N, float min_dist, float max_dist, float 
 void object_model::set_and_init_all(terrain_model& env)
 {
 	set_palm_tree();
+	set_palm_tree2();
+
 	set_rock1();
 	set_rock2();
 	set_billboards();
@@ -293,5 +295,32 @@ void object_model::draw_billboards(std::map<std::string, GLuint>& shaders, scene
 
 
 	glDepthMask(true);
+
+}
+
+// Palm Tree 2
+
+
+mesh object_model::create_palm_tree2()
+{
+	mesh palm_cpu = mesh_load_file_obj("scenes/3D_graphics/02_texture/assets/palm2/OBJ/CoconutPalm.obj");
+	return palm_cpu;
+}
+
+void object_model::set_palm_tree2()
+{
+	palm_tree2 = create_palm_tree2();
+	palm_tree2.uniform.transform.scaling = 0.5f;
+	//palm_tree2_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/palm2/OBJ/Stem_3_Normal.png"));
+}
+
+void object_model::draw_palm_tree2(std::map<std::string, GLuint>& shaders, scene_structure& scene)
+{
+	glUseProgram(shaders["mesh_sun"]);
+	glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, palm_tree2_texture_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	draw(palm_tree2, scene.camera, shaders["mesh_sun"]);
 
 }
