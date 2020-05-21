@@ -18,7 +18,7 @@ struct gui_scene_structure
     bool skybox = false;
     bool billboards = false;
     bool terrain = true;
-    bool particles = true;
+    bool particles = false;
     bool fauna = true;
     bool keyframes = false;
 };

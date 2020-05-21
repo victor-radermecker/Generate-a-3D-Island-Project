@@ -28,20 +28,26 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
 {
 
     // Create fauna
+    //fauna.init_timer();
     fauna.setup_bird();
-    fauna.set_keyframes();
+    fauna.set_bird_keyframes();
+
+    //shark
+    fauna.set_shark();
+    fauna.set_shark_keyframes();
 
     // Create and initialise terrain surface
     env.set_terrain();
     // Create and initialise ocean
     //env.set_ocean();
 
+
     //create first palm tree
-    objects.set_and_init_all(env);
+    //objects.set_and_init_all(env);
 
     //setting lava in volcano
-    lava.set_lava();
-    lava.create_particule(shaders, scene);
+    //lava.set_lava();
+    //lava.create_particule(shaders, scene);
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
@@ -68,7 +74,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
     glPolygonOffset(1.0, 1.0);
 
-
+  
 
     /********************************/
     /*         DISPLAY FAUNA       */
@@ -77,8 +83,12 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     if (gui_scene.fauna) {
         fauna.update_bird();
         fauna.draw_bird(shaders, scene);
-        if (gui_scene.keyframes)
-            fauna.draw_keyframes(shaders, scene);
+        fauna.update_shark();
+        fauna.draw_shark(shaders, scene);
+        if (gui_scene.keyframes) {
+            fauna.draw_keyframes(shaders, scene, fauna.bird_keyframes, { 1,1,1 });
+            fauna.draw_keyframes(shaders, scene, fauna.shark_keyframes, { 1,0,1 });
+        }
     }
 
     /********************************/
