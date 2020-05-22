@@ -39,15 +39,15 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     // Create and initialise terrain surface
     env.set_terrain();
     // Create and initialise ocean
-    //env.set_ocean();
+    env.set_ocean();
 
 
     //create first palm tree
     //objects.set_and_init_all(env);
 
     //setting lava in volcano
-    //lava.set_lava();
-    //lava.create_particule(shaders, scene);
+    lava.set_lava();
+    lava.create_particule(shaders, scene);
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
@@ -55,7 +55,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     scene.camera.apply_rotation(0,0,0,1.2f);
 
     // Setup skybox
-    //skybox.set_skybox();
+    skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 10.0f;
@@ -126,10 +126,10 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     /*         DISPLAY PARTICLES          */
     /*************************************/
     if (gui_scene.particles) {
-        lava.update_particles();
-        lava.draw_particles(shaders, scene);
         lava.update_lava(lava.lava, lava.lava_positions, lava.lava_normals, lava.lava_connectivity, t, timer.t_max, lava.lava_perlin);
         lava.draw_lava(shaders, scene);
+        lava.update_particles();
+        lava.draw_particles(shaders, scene);
 
     }
 
@@ -172,7 +172,19 @@ void scene_model::set_gui()
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
     ImGui::SliderFloat("Time scale", &timer.scale, 0.1f, 3.0f);
 
-   
+    if (ImGui::Button("Print Keyframe"))
+    {
+        std::cout << "keyframe_position={";
+        for (size_t k = 0; k < fauna.shark_keyframes.size(); ++k)
+        {
+            const vec3& p = fauna.shark_keyframes[k].p;
+            std::cout << "{" << p.x << "f," << p.y << "f," << p.z << "f}";
+            if (k < fauna.shark_keyframes.size() - 1)
+                std::cout << ", ";
+        }
+        std::cout << "}" << std::endl;
+    }
+
 }
 
 

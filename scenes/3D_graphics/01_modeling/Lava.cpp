@@ -95,7 +95,17 @@ void lava_model::draw_particles(std::map<std::string, GLuint>& shaders, scene_st
         //draw(fire_sphere, scene.camera, shaders["mesh"]);
         draw_rock(shaders, scene);
     }
-    
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(shaders["mesh_sun"]);
+    glEnable(GL_BLEND);
+    glDepthMask(false); // deactivate zbuffer writing
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, sprite_fire.texture_id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    sprite_fire.uniform.transform.rotation = scene.camera.orientation;
+
     for (particle_structure& part : fire_particles)
     {
         //particle.uniform.transform.scaling = part.scale;
@@ -103,41 +113,32 @@ void lava_model::draw_particles(std::map<std::string, GLuint>& shaders, scene_st
         //draw(particle, scene.camera, shaders["mesh"]);
         //particle.uniform.transform.scaling = 1;
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glUseProgram(shaders["mesh_sun"]);
-        glEnable(GL_BLEND);
-        glDepthMask(false); // deactivate zbuffer writing
-        glActiveTexture(GL_TEXTURE0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glBindTexture(GL_TEXTURE_2D, sprite_fire.texture_id);
 
         sprite_fire.uniform.transform.scaling = 2.f * part.scale;
-        sprite_fire.uniform.transform.rotation = scene.camera.orientation;
         sprite_fire.uniform.transform.translation = part.p;
 
         draw(sprite_fire, scene.camera, shaders["mesh"]);
-        glDepthMask(true); // Important: reactivate writing in ZBuffer for future drawing
     }
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(shaders["mesh_sun"]);
+    glEnable(GL_BLEND);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, sprite_smoke.texture_id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    sprite_smoke.uniform.transform.rotation = scene.camera.orientation;
 
     for (particle_structure& part : particles)
     {
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glUseProgram(shaders["mesh_sun"]);
-        glEnable(GL_BLEND);
-        glDepthMask(false); // deactivate zbuffer writing
-        glActiveTexture(GL_TEXTURE0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glBindTexture(GL_TEXTURE_2D, sprite_smoke.texture_id);
 
         sprite_smoke.uniform.transform.scaling = 5.0f * part.scale;
-        sprite_smoke.uniform.transform.rotation = scene.camera.orientation;
         sprite_smoke.uniform.transform.translation = part.p;
 
         draw(sprite_smoke, scene.camera, shaders["mesh"]);
-        glDepthMask(true); // Important: reactivate writing in ZBuffer for future drawing
     }
+    glDepthMask(true); // Important: reactivate writing in ZBuffer for future drawing
+
 }
 
 
