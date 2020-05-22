@@ -46,8 +46,8 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     //objects.set_and_init_all(env);
 
     //setting lava in volcano
-    lava.set_lava();
-    lava.create_particule(shaders, scene);
+    //lava.set_lava();
+    //lava.create_particule(shaders, scene);
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
@@ -55,7 +55,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     scene.camera.apply_rotation(0,0,0,1.2f);
 
     // Setup skybox
-    skybox.set_skybox();
+    //skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 10.0f;
@@ -74,7 +74,9 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
     glPolygonOffset(1.0, 1.0);
 
-  
+    //scene.gluPerspective(45.0f, (GLfloat)500 / (GLfloat)500, 0.5f, 3000000.0f);
+
+    
 
     /********************************/
     /*         DISPLAY FAUNA       */

@@ -1,10 +1,19 @@
+#define _USE_MATH_DEFINES
+
 #include "Environment.hpp"
 #include <algorithm>
 #include <iostream> 
 #include <stdlib.h>    
 #include <ctime>
+#include <cmath>
+#include <random>
 
 using namespace vcl;
+
+//random generator
+std::default_random_engine generator_mountains;
+std::uniform_real_distribution<float> distrib_mountains(0.2, 2.3);
+std::uniform_real_distribution<float> distrib_angle(0.9, 1.15);
 
 
 // --------------------------------------------------- //
@@ -69,6 +78,9 @@ vec3 terrain_model::evaluate_terrain(float u, float v, std::string type = "None"
     else if (type == "sand") {
         p = evaluate_terrain_sand(u, v);
     }
+    else if (type == "mountain") {
+        p = evaluate_terrain_mountain(u, v);
+    }
 
     else {
         float x = 0;
@@ -96,9 +108,14 @@ float terrain_model::evaluate_terrain_z(float u, float v)
 void terrain_model::set_terrain()
 {
     islands.set_island_parameters(islands.u0, islands.h, islands.sigma, islands.N);
+    islands.set_mountains_parameters(islands.u0_mountains, islands.h_mountains, islands.sigma_mountains, islands.N_mountains);
+
 
     terrain.push_back(create_terrain("volcano", { 0,0,0 }));
     terrain.push_back(create_terrain("sand", { 0,0,0 }));
+    terrain.push_back(create_terrain("mountain", { 0,0,-2.5f }));
+
+
     terrain[0].uniform.color = { 1.0f, 1.0f, 1.0f };
 
     terrain[0].uniform.shading.ambiant = 0.6;
@@ -127,8 +144,8 @@ void terrain_model::set_terrain()
 
 vec3 terrain_model::evaluate_ocean(float u, float v)
 {
-    const float x = 200 * (u - 0.5f);
-    const float y = 200 * (v - 0.5f);
+    const float x = 300 * (u - 0.5f);
+    const float y = 300 * (v - 0.5f);
     float z = 0.3f;
 
     return { x,y,z };
@@ -429,6 +446,10 @@ void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_s
     uniform(shaders["terrain1"], "grass_sampler", 1);
 
     draw(terrain[1], scene.camera, shaders["terrain1"]);
+
+
+    draw(terrain[2], scene.camera, shaders["terrain1"]);
+
 }
 
 
@@ -447,3 +468,77 @@ void terrain_model::draw_ocean(std::map<std::string, GLuint>& shaders, scene_str
 
 
 
+// --------------------------------------------------- //
+//                  Mountain chains                    //
+// --------------------------------------------------- //
+
+
+void island_param::set_mountains_parameters(std::vector<vec2>& u0_mountains, std::vector<float>& h_moutains, std::vector<float>& sigma_mountains, int& N_mountains)
+{
+    N_mountains = 12;
+    float radius = 0.45; //(used to set the center of each gaussian);
+    float alpha = 1.75 * M_PI / N_mountains;
+
+    std::vector<vec2> u0;
+    for (int i = 0;i < N_mountains;i++) {
+        float randt = distrib_angle(generator_mountains);
+        float x = 0.5 + randt * radius * std::cos(i * alpha);
+        float y = 0.5 + randt * radius * std::sin(i * alpha);
+        u0_mountains.push_back({ x,y });
+        std::cout << x << "  " << y << std::endl;
+        h_mountains.push_back(25.f * distrib_mountains(generator_mountains));
+        sigma_mountains.push_back(0.1f * distrib_angle(generator_mountains));
+    }
+}
+
+
+
+
+vec3 terrain_model::evaluate_terrain_mountain(float u, float v)
+{
+    //set parameters for Perlin Noise
+    const float scaling = 1.5;
+    const int octave = 8;
+    const float persistency = 0.85;
+    const float height = 0.85;
+    const float noise = perlin(scaling * u, scaling * v, octave, persistency);
+
+    float c = 0.3f + 0.7f * noise;
+    float x = 475 * (u - 0.5f);
+    float y = 475 * (v - 0.5f);
+    float z = evaluate_terrain_z_mountain(u, v);
+    z *= 1 + c * std::exp(-z/20);
+
+
+    return { x,y,z };
+}
+
+
+
+
+float terrain_model::evaluate_terrain_z_mountain(float u, float v)
+{
+    //        - a very flat gaussian function for the circle
+    //        - a similar one but negative
+    float z = 0;
+    //const std::vector<vec2> u0 = { {0.25f,0.25f},{0.75f,0.75f},{0.25f,0.75f},{0.75f,0.25f} };
+    //const float h0 = 20.f;
+    //const float sigma0 = 0.05f;
+    
+
+    for (int i = 0;i < islands.N_mountains;i++) {
+        float d = norm(vec2(u, v) - islands.u0_mountains[i]) / islands.sigma_mountains[i];
+        z += islands.h_mountains[i] * std::exp(-d * d);
+    }
+    /*
+    //normal - very flat a large
+    const float d = norm(vec2(u, v) - u0) / sigma0;
+    z = h0 * std::exp(-d * d);
+    */
+    //normal 2 (cratère)
+    //const float d2 = norm(vec2(u, v) - u0) / (sigma0 / 2);
+    //z -= (h0 / 2) * std::exp(-d2 * d2);
+
+    return z;
+
+}

@@ -24,7 +24,13 @@ struct island_param
 	std::vector<float> sigma;
 	int N;
 
+	std::vector<vcl::vec2> u0_mountains;
+	std::vector<float> h_mountains;
+	std::vector<float> sigma_mountains;
+	int N_mountains;
+
 	void set_island_parameters(std::vector<vcl::vec2>& u0, std::vector<float>& h, std::vector<float>& sigma, int& N);
+	void set_mountains_parameters(std::vector<vcl::vec2>& u0_mountains, std::vector<float>& h_moutains, std::vector<float>& sigma_mountains, int& N_mountains);
 
 };
 
@@ -54,14 +60,17 @@ struct terrain_model
 	perlin_noise ocean_perlin;
 
 
-
 	//volcano
 	float evaluate_terrain_z_volcano(float u, float v);
-	vcl::vec3 terrain_model::evaluate_terrain_volcano(float u, float v);
+	vcl::vec3 evaluate_terrain_volcano(float u, float v);
 
-	//sand
+	//sand (little islands)
 	vcl::vec3 terrain_model::evaluate_terrain_sand(float u, float v);
 	float evaluate_terrain_z_sand(float u, float v);
+
+	//Moutain chains
+	float evaluate_terrain_z_mountain(float u, float v);
+	vcl::vec3 evaluate_terrain_mountain(float u, float v);
 
 
 	//Mesh objects
