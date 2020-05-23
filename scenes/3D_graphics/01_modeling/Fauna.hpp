@@ -24,13 +24,9 @@ struct fauna_model
 	vcl::mesh_drawable keyframe_visual;                    // keyframe samples
 	vcl::mesh_drawable keyframe_picked;                    // showing the picked sample
 	vcl::segment_drawable_immediate_mode segment_drawer;   // used to draw segments between keyframe samples
-	vcl::curve_dynamic_drawable trajectory;                // Draw the trajectory of the moving point as a curve
 	int picked_object;									   // Getting an element of the trajectory
 
-	//User interation
 	void draw_keyframes(std::map<std::string, GLuint>& shaders, scene_structure& scene, vcl::buffer<vec3t>& keys, vcl::vec3 color);
-	void mouse_click(scene_structure& scene, GLFWwindow* window, int, int, int);
-	void mouse_move(scene_structure& scene, GLFWwindow* window);
 
 
 
@@ -61,7 +57,10 @@ struct fauna_model
 	void update_shark();
 
 
-
-
+	//User interation
+	void mouse_click(scene_structure& scene, GLFWwindow* window, int, int, int);
+	void mouse_move(scene_structure& scene, GLFWwindow* window);
+	bool bird_clicked;
+	bool shark_clicked;
 
 };

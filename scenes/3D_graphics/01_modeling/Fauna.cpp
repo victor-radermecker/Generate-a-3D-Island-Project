@@ -53,7 +53,7 @@ vec3 fauna_model::get_position(float t, vcl::buffer<vec3t>& keys) {
     const vec3& p0 = keys[idx - 1].p;    // = p_i - 1
     const vec3& p3 = keys[idx + 2].p;  // = p_{i+2}
 
-    return cardinal_interpolation(t, t0, t1, t2, t3, p0, p1, p2, p3, 0.5f);
+    return cardinal_interpolation(t, t0, t1, t2, t3, p0, p1, p2, p3, 1.0f);
 
 }
 
@@ -219,7 +219,7 @@ void fauna_model::setup_bird() {
     bird.add(shoulder, "shoulder_right", "body", { {0.1f,-radius_body * 0.6f,0}, {1,0,0, 0,-1,0, 0,0,1}/*Symmetry*/ });
     bird.add(arm, "arm_bottom_right", "shoulder_right", { 0,shoulder_length,0 });
     
-
+    bird_clicked = false;
 }
 
 void fauna_model::set_bird_keyframes()
@@ -357,7 +357,11 @@ void fauna_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, i
     // Check that the mouse is clicked (drag and drop)
     const bool mouse_click_left = glfw_mouse_pressed_left(window);
     const bool key_shift = glfw_key_shift_pressed(window);
-
+    
+    /******************/
+    /*MOVING KEYFRAMES*/
+    /******************/
+    /*
     // Check if shift key is pressed
     if (mouse_click_left && key_shift)
     {
@@ -385,17 +389,49 @@ void fauna_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, i
             }
         }
     }
+    */
+
+    /*   INTERACTING WITH SHARK   */
     if (mouse_click_left) {
         const ray r = picking_ray(scene.camera, cursor);
         //Trying to interact with the shark
         const float t = timer_fauna_shark.t;
         const vec3 shark_p = get_position(t, shark_keyframes);
-        const picking_info info_shark = ray_intersect_sphere(r, shark_p, 1.0f);
+        const picking_info info_shark = ray_intersect_sphere(r, shark_p, 4.0f);
         if (info_shark.picking_valid) // the ray intersects a sphere
         {
             std::cout << "You clicked on the shark !" << std::endl;
+            if (!shark_clicked)
+            {
+                scene.camera.scale = 10.0f;
+                shark_clicked = true;
+                bird_clicked = false;
+            }
+            else
+                shark_clicked = false;
         }
     }
+    /*   INTERACTING WITH BIRD */
+    if (mouse_click_left) {
+        const ray r = picking_ray(scene.camera, cursor);
+        //Trying to interact with the bird
+        const float t = timer_fauna_bird.t;
+        const vec3 bird_p = get_position(t, bird_keyframes);
+        const picking_info info_bird = ray_intersect_sphere(r, bird_p, 2.0f);
+        if (info_bird.picking_valid) // the ray intersects a sphere
+        {
+            std::cout << "You clicked on the bird !" << std::endl;
+            if (!bird_clicked)
+            {
+                scene.camera.scale = 10.0f;
+                bird_clicked = true;
+                shark_clicked = false;
+            }
+            else
+                bird_clicked = false;
+        }
+    }
+
 
 }
 
@@ -459,6 +495,7 @@ void fauna_model::set_shark()
     shark = create_shark();
     shark.uniform.transform.scaling_axis = { 3.2f,4.0,3.2f };
     //shark_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/asserts/shark/Sharktexture002.png"));
+    shark_clicked = false;
 }
 
 void fauna_model::draw_shark(std::map<std::string, GLuint>& shaders, scene_structure& scene)

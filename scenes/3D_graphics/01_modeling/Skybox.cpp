@@ -79,7 +79,7 @@ mesh create_skybox_top(float size)
 
 void skybox_model::set_skybox()
 {
-    float size = 300.0f;
+    float size = 450.0f;
     skybox.back = create_skybox_back(size);
     skybox.bottom = create_skybox_bottom(size);
     skybox.front = create_skybox_front(size);
@@ -99,6 +99,7 @@ void skybox_model::set_skybox()
 
 void skybox_model::draw_skybox(std::map<std::string, GLuint>& shaders, scene_structure& scene)
 {
+    glDepthMask(GL_FALSE);
     vec3 camPos = scene.camera.camera_position();
     glActiveTexture(GL_TEXTURE0);
 
@@ -125,4 +126,5 @@ void skybox_model::draw_skybox(std::map<std::string, GLuint>& shaders, scene_str
     glBindTexture(GL_TEXTURE_2D, skybox_ids.top);
     skybox.top.uniform.transform.translation = camPos;
     draw(skybox.top, scene.camera, shaders["skybox"]);
+    glDepthMask(GL_TRUE);
 }

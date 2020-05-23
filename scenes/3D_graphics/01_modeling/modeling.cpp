@@ -24,7 +24,7 @@ mesh create_terrain();
 
 /** This function is called before the beginning of the animation loop
     It is used to initialize all part-specific data */
-void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_structure& scene, gui_structure& )
+void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_structure& scene, gui_structure& gui)
 {
 
     // Create fauna
@@ -54,8 +54,13 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     scene.camera.scale = 10.0f;
     scene.camera.apply_rotation(0,0,0,1.2f);
 
+    // Setup gui
+    gui.show_frame_camera = false;
+    gui.show_frame_worldspace = false;
+
+
     // Setup skybox
-    //skybox.set_skybox();
+    skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 10.0f;
@@ -75,7 +80,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     glPolygonOffset(1.0, 1.0);
 
     //scene.gluPerspective(45.0f, (GLfloat)500 / (GLfloat)500, 0.5f, 3000000.0f);
-
+    
     
 
     /********************************/
@@ -84,15 +89,28 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 
     if (gui_scene.fauna) {
         fauna.update_bird();
-        fauna.draw_bird(shaders, scene);
         fauna.update_shark();
+
+
+        //INTERACTION WITH SHARK/BIRD
+        if (fauna.bird_clicked)
+        {
+            scene.camera.translation = -fauna.bird["body"].transform.translation;
+            scene.camera.orientation = fauna.bird["body"].transform.rotation * mat3(0, 0, -1, 1, 0, 0, 0, 1, 0);
+        }
+        else if (fauna.shark_clicked)
+        {
+            scene.camera.translation = -fauna.shark.uniform.transform.translation - vec3(0, 0, 3.0f);
+            scene.camera.orientation = fauna.shark.uniform.transform.rotation * mat3(0, 0, 1, 0, 1, 0, 1, 0, 0);
+        }
+
+        fauna.draw_bird(shaders, scene);
         fauna.draw_shark(shaders, scene);
         if (gui_scene.keyframes) {
             fauna.draw_keyframes(shaders, scene, fauna.bird_keyframes, { 1,1,1 });
             fauna.draw_keyframes(shaders, scene, fauna.shark_keyframes, { 1,0,1 });
         }
     }
-
     /********************************/
     /*     DISPLAY ENV OBJECTS     */
     /******************************/
@@ -118,13 +136,6 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     }
 
     /**************************************/
-    /*         DISPLAY SKYBOX            */
-    /*************************************/
-    if (gui_scene.skybox) {
-        skybox.draw_skybox(shaders, scene);
-    }
-
-    /**************************************/
     /*         DISPLAY PARTICLES          */
     /*************************************/
     if (gui_scene.particles) {
@@ -143,7 +154,14 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     if (gui_scene.billboards) {
         objects.draw_billboards(shaders, scene, objects.Identity3, objects.Rotation);
     }
-    
+    /**************************************/
+/*         DISPLAY SKYBOX            */
+/*************************************/
+    // Should be last
+    if (gui_scene.skybox) {
+        skybox.draw_skybox(shaders, scene);
+    }
+
  }
 
 void scene_model::mouse_click(scene_structure& scene, GLFWwindow* window, int x, int y, int z)
@@ -173,19 +191,6 @@ void scene_model::set_gui()
     ImGui::Spacing();
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
     ImGui::SliderFloat("Time scale", &timer.scale, 0.1f, 3.0f);
-
-    if (ImGui::Button("Print Keyframe"))
-    {
-        std::cout << "keyframe_position={";
-        for (size_t k = 0; k < fauna.shark_keyframes.size(); ++k)
-        {
-            const vec3& p = fauna.shark_keyframes[k].p;
-            std::cout << "{" << p.x << "f," << p.y << "f," << p.z << "f}";
-            if (k < fauna.shark_keyframes.size() - 1)
-                std::cout << ", ";
-        }
-        std::cout << "}" << std::endl;
-    }
 
 }
 
