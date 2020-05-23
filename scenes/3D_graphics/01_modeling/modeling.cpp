@@ -35,12 +35,14 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     //shark
     fauna.set_shark();
     fauna.set_shark_keyframes();
-
+    
     // Create and initialise terrain surface
     env.set_terrain();
     // Create and initialise ocean
-    env.set_ocean();
+    //env.set_ocean();
 
+    // Create treasure
+    treasure.create_treasure_box();
 
     //create first palm tree
     //objects.set_and_init_all(env);
@@ -60,7 +62,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
 
 
     // Setup skybox
-    skybox.set_skybox();
+    //skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 10.0f;
@@ -82,6 +84,11 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     //scene.gluPerspective(45.0f, (GLfloat)500 / (GLfloat)500, 0.5f, 3000000.0f);
     
     
+    // Draw treasure
+    treasure.draw_treasure(shaders, scene);
+
+
+
 
     /********************************/
     /*         DISPLAY FAUNA       */
