@@ -50,8 +50,8 @@ struct scene_model : scene_base
 
     void mouse_click(scene_structure& scene, GLFWwindow* window, int button, int action, int mods);
     void mouse_move(scene_structure& scene, GLFWwindow* window);
+    void update_shaders(float t, std::map<std::string, GLuint>& shaders);
 
-    vcl::timer_interval timer_sun;
 };
 
 #endif
