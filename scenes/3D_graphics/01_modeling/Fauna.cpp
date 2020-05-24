@@ -384,7 +384,6 @@ void fauna_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, i
                 if (picked_object == -1 || distance < distance_min) {
                     distance_min = distance;
                     picked_object = k;
-                    std::cout << "you cliked on the point!" << std::endl;
                 }
             }
         }
@@ -431,8 +430,6 @@ void fauna_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, i
                 bird_clicked = false;
         }
     }
-
-
 }
 
 void fauna_model::mouse_move(scene_structure& scene, GLFWwindow* window)

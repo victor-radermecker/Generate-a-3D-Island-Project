@@ -70,20 +70,19 @@ void treasure_model::draw_treasure(std::map<std::string, GLuint>& shaders, scene
 
 // Create the bridge
 
-
-
 void treasure_model::set_bridge()
 {
 	bridge = create_bridge();
-	bridge.uniform.transform.scaling = 1.f;
-	bridge_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/old_bridge/TEXTURE.png"));
+	bridge.uniform.transform.scaling = 0.025f;
+	bridge_position = vec3(-60.f, -9.1f, 3.5f);
+	bridge_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/bridge/textures/VARANDE_AO.png"));
 }
 
 
 mesh treasure_model::create_bridge()
 {
-	mesh rock_cpu = mesh_load_file_obj("scenes/3D_graphics/02_texture/assets/old_bridge/Old stone bridgeOBJ.obj");
-	return rock_cpu;
+	mesh bridge_cpu = mesh_load_file_obj("scenes/3D_graphics/02_texture/assets/bridge/BRIDGE_LOW.obj");
+	return bridge_cpu;
 }
 
 
@@ -95,8 +94,41 @@ void treasure_model::draw_bridge(std::map<std::string, GLuint>& shaders, scene_s
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-	mat3 rot_bridge = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.57f);
-	bridge.uniform.transform.rotation = rot_bridge;
-	bridge.uniform.transform.translation = vec3(10.f,10.f,15.f);
+	mat3 rot_bridge1 = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.57f);
+
+	bridge.uniform.transform.rotation = rot_bridge1;
+	bridge.uniform.transform.translation = bridge_position; // set the position of bridge to 'bridge' position
 	draw(bridge, scene.camera, shaders["mesh_sun"]);
+}
+
+// Create the canoe
+
+void treasure_model::set_canoe()
+{
+	canoe = create_canoe();
+	canoe.uniform.transform.scaling = 1.f;
+	canoe_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/canoe/wood.png"));
+}
+
+
+mesh treasure_model::create_canoe()
+{
+	mesh canoe_cpu = mesh_load_file_obj("scenes/3D_graphics/02_texture/assets/canoe/Canoe.obj");
+	return canoe_cpu;
+}
+
+
+void treasure_model::draw_canoe(std::map<std::string, GLuint>& shaders, scene_structure& scene)
+{
+	glUseProgram(shaders["mesh_sun"]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, canoe_texture_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	canoe_position = vec3(27.f, -10.1f, 3.5f);
+	mat3 rot_canoe = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.57f);
+	mat3 rot_canoe2 = rotation_from_axis_angle_mat3(vec3(0, 0, 1), -1.57f/3.5);
+	canoe.uniform.transform.rotation = rot_canoe * rot_canoe2;
+	canoe.uniform.transform.translation = canoe_position; 
+	draw(canoe, scene.camera, shaders["mesh_sun"]);
 }
