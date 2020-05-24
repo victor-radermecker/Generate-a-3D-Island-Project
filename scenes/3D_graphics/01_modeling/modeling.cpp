@@ -43,15 +43,18 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
 
     // Create treasure
     treasure.create_treasure_box();
+<<<<<<< HEAD
     treasure.set_bridge();
     treasure.set_canoe();
+=======
+>>>>>>> shaders
 
     //create first palm tree
     objects.set_and_init_all(env);
 
     //setting lava in volcano
-    //lava.set_lava();
-    //lava.create_particule(shaders, scene);
+    lava.set_lava();
+    lava.create_particule(shaders, scene);
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
@@ -82,18 +85,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     const float t = timer.t;
 
     //Update shaders
-    glUseProgram(shaders["terrain"]);
-    uniform(shaders["terrain"], "time", t);
-
-    glUseProgram(shaders["terrain1"]);
-    uniform(shaders["terrain1"], "time", t);
-
-    glUseProgram(shaders["mesh_sun"]);
-    uniform(shaders["mesh_sun"], "time", t);
-
-    glUseProgram(shaders["skybox"]);
-    uniform(shaders["skybox"], "time", t);
-
+    update_shaders(t, shaders);
 
 
     set_gui();
@@ -204,7 +196,92 @@ void scene_model::mouse_move(scene_structure& scene, GLFWwindow* window)
         fauna.mouse_move(scene, window);
 }
 
+void scene_model::update_shaders(float t, std::map<std::string, GLuint>& shaders)
+{
+    float ambiant;
+    float diffuse;
+    float time_normalized = t / 120.0;
+    vec3 light = vec3(-800.0f * cos(3.14f / 60.0f * t), 300.0f, 200.0f * cos(3.14f / 60.0f * t));
 
+    vec3 sun_color;
+    if (time_normalized < 0.25)
+    {
+        sun_color = vec3(0.9 - 4 * 0.1 * time_normalized, 0.7, 0.5 + 4 * 0.1 * time_normalized);
+        ambiant = 0.6 + 4 * 0.3 * time_normalized;
+        diffuse = 0.6 + 4 * 0.2 * time_normalized;
+
+    }
+    else if (time_normalized < 0.5)
+    {
+        sun_color = vec3(0.8 - 4 * 0.1 * (time_normalized - 0.25), 0.7 - 4 * 0.2 * (time_normalized - 0.25), 0.6 - 4 * 0.1 * (time_normalized - 0.25));
+        ambiant = 0.9 - 4 * 0.3 * (time_normalized - 0.25);
+        diffuse = 0.8 - 4 * 0.2 * (time_normalized - 0.25);
+    }
+    else if (time_normalized < 0.75)
+    {
+        sun_color = vec3(0.7 - 4 * 0.5 * (time_normalized - 0.5), 0.5 - 4 * 0.3 * (time_normalized - 0.5), 0.5);
+        ambiant = 0.6 - 4 * 0.2 * (time_normalized - 0.5);
+        diffuse = 0.6 - 4 * 0.4 * (time_normalized - 0.5);
+
+    }
+    else
+    {
+        sun_color = vec3(0.2 + 4 * 0.7 * (time_normalized - 0.75), 0.2 + 4 * 0.5 * (time_normalized - 0.75), 0.5);
+        ambiant = 0.4 + 4 * 0.2 * (time_normalized - 0.75);
+        diffuse = 0.2 + 4 * 0.4 * (time_normalized - 0.75);
+    }
+
+    glUseProgram(shaders["terrain"]);
+    uniform(shaders["terrain"], "light", light);
+    uniform(shaders["terrain"], "sun_color", sun_color);
+    uniform(shaders["terrain"], "ambiant_sun", ambiant);
+    uniform(shaders["terrain"], "diffuse_sun", diffuse);
+
+    glUseProgram(shaders["terrain1"]);
+    uniform(shaders["terrain1"], "light", light);
+    uniform(shaders["terrain1"], "sun_color", sun_color);
+    uniform(shaders["terrain1"], "ambiant_sun", ambiant);
+    uniform(shaders["terrain1"], "diffuse_sun", diffuse);
+
+    glUseProgram(shaders["mesh_sun"]);
+    uniform(shaders["mesh_sun"], "light", light);
+    uniform(shaders["mesh_sun"], "sun_color", sun_color);
+    uniform(shaders["mesh_sun"], "ambiant_sun", ambiant);
+    uniform(shaders["mesh_sun"], "diffuse_sun", diffuse);
+
+
+
+
+    /* FOR SKYBOX */
+    vec3 color;
+    if (time_normalized < 0.25)
+    {
+        color = vec3(0.9 - 4 * 0.1 * time_normalized, 0.7 + 4 * 0.1 * time_normalized, 0.6 + 4 * 0.2 * time_normalized);
+        ambiant = 0.3 + 4 * 0.5 * time_normalized;
+
+    }
+    else if (time_normalized < 0.5)
+    {
+        color = vec3(0.8 - 4 * 0.1 * (time_normalized - 0.25), 0.8 - 4 * 0.2 * (time_normalized - 0.25), 0.8 - 4 * 0.2 * (time_normalized - 0.25));
+        ambiant = 0.8 - 4 * 0.5 * (time_normalized - 0.25);
+    }
+    else if (time_normalized < 0.75)
+    {
+        color = vec3(0.7 - 4 * 0.5 * (time_normalized - 0.5), 0.6 - 4 * 0.4 * (time_normalized - 0.5), 0.6);
+        ambiant = 0.3 - 4 * 0.2 * (time_normalized - 0.5);
+
+    }
+    else
+    {
+        color = vec3(0.2 + 4 * 0.7 * (time_normalized - 0.75), 0.2 + 4 * 0.5 * (time_normalized - 0.75), 0.6);
+        ambiant = 0.1 + 4 * 0.2 * (time_normalized - 0.75);
+    }
+
+    glUseProgram(shaders["skybox"]);
+    uniform(shaders["skybox"], "color_sun", color);
+    uniform(shaders["skybox"], "ambiant_sun", ambiant);
+
+}
 
 void scene_model::set_gui()
 {

@@ -118,18 +118,12 @@ void terrain_model::set_terrain()
 
     terrain[0].uniform.color = { 1.0f, 1.0f, 1.0f };
 
-    terrain[0].uniform.shading.ambiant = 0.6;
-    terrain[0].uniform.shading.diffuse = 0.7;
     terrain[0].uniform.shading.specular = 0.1;
     terrain[0].uniform.shading.specular_exponent = 64;
 
-    terrain[1].uniform.shading.ambiant = 0.6;
-    terrain[1].uniform.shading.diffuse = 0.8;
     terrain[1].uniform.shading.specular = 0.1;
     terrain[1].uniform.shading.specular_exponent = 64;
 
-    terrain[2].uniform.shading.ambiant = 0.6;
-    terrain[2].uniform.shading.diffuse = 0.8;
     terrain[2].uniform.shading.specular = 0.1;
     terrain[2].uniform.shading.specular_exponent = 64;
 
@@ -272,8 +266,6 @@ void terrain_model::set_ocean()
     ocean.uniform.transform.translation = { 0,0,1.0f };
 
     // Illumination parameters
-    ocean.uniform.shading.ambiant = 0.6f;
-    ocean.uniform.shading.diffuse = 0.4;
     ocean.uniform.shading.specular = 0.8f;
     ocean.uniform.shading.specular_exponent = 512;
 
