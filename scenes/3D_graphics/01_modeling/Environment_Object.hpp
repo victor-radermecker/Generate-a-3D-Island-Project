@@ -9,10 +9,13 @@ struct object_model
 	std::vector<vcl::vec3> list_position_rock1;
 	std::vector<vcl::vec3> list_position_rock2;
 	std::vector<vcl::vec3> tree_position;
+	std::vector<vcl::vec3> mountains_tree_position;
+
 
 	std::vector<vcl::mat3> rock1_rotations;	
 	std::vector<vcl::mat3> rock2_rotations;
 	std::vector<vcl::mat3> tree_rotations;
+	std::vector<vcl::mat3> mountain_tree_rotations;
 
 
 	int N_rocks1;
@@ -80,6 +83,7 @@ struct object_model
 	void init_rocks2(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
 	void init_trees(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
 	void init_billboards(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
+	void init_trees_mountains(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env);
 
 	void set_and_init_all(terrain_model& env);
 

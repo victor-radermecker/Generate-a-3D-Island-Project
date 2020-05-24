@@ -47,7 +47,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     treasure.set_canoe();
 
     //create first palm tree
-    //objects.set_and_init_all(env);
+    objects.set_and_init_all(env);
 
     //setting lava in volcano
     //lava.set_lava();

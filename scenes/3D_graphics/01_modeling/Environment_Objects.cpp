@@ -1,6 +1,14 @@
+#define _USE_MATH_DEFINES
+
 #include "Environment_Object.hpp"
+#include <cmath>
 
 using namespace vcl;
+
+std::default_random_engine generator_palm_trees;
+std::uniform_real_distribution<float> distrib_mountains_tree(0.31, 0.53);
+
+
 
 mesh object_model::create_rock1()
 {
@@ -82,19 +90,35 @@ void object_model::update_random_position(int N, std::vector<vcl::vec3>& list_po
 	//N is the total number of trees to place, i is the number currently places
 	int i = 0;
 	while (i < N) {
-		float u = (float)rand() / (float)RAND_MAX;
-		float v = (float)rand() / (float)RAND_MAX;
 
-		vec3 pos = env.evaluate_terrain(u, v, terrain_type, vec3(0, 0, 0));
-		if (acceptablePosition(pos, list_position, min_dist, max_dist, min_height, is_billboard)) {
+		if (terrain_type == "mountain") {
+			float theta = (float)rand() / (float)RAND_MAX;
+			theta *= 2 * M_PI;
+			float radius = distrib_mountains_tree(generator_palm_trees);
+			float u = 0.5f + radius * std::cos(theta);
+			float v = 0.5f + radius * std::sin(theta);
+			//float u = distrib_mountains_tree_angle(generator_palm_trees);
+			//float v = distrib_mountains_tree_angle(generator_palm_trees);
+			vec3 pos = env.evaluate_terrain(v, u, "mountain", { 0,0,0 });
+			i++;
 			list_position.push_back(pos - vec3(0, 0, z_offset_down));
-			++i;
+		}
+		else {
+
+			float u = (float)rand() / (float)RAND_MAX;
+			float v = (float)rand() / (float)RAND_MAX;
+
+			vec3 pos = env.evaluate_terrain(u, v, terrain_type, vec3(0, 0, 0));
+			if (acceptablePosition(pos, list_position, min_dist, max_dist, min_height, is_billboard)) {
+				list_position.push_back(pos - vec3(0, 0, z_offset_down));
+				++i;
+			}
 		}
 	}
 }
 bool object_model::acceptablePosition(vcl::vec3 pos, std::vector<vcl::vec3> list_position, float min_dist, float max_dist, float min_height, bool is_billboard)
 {
-	// Verify if the object is not to far/close to center, or too low (in the water)
+	// Check if the object is not to far/close to center, or too low (in the water)
 	vec2 pos_xy = vec2(pos.x, pos.y);
 	float dist = norm(pos_xy);
 	if (dist < min_dist || dist > max_dist || pos.z < min_height)
@@ -141,8 +165,17 @@ void object_model::init_trees(int N, float min_dist, float max_dist, float min_h
 	mat3 base_rot = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.5f);
 	for(int i = 0; i < N; i++)
 		tree_rotations.push_back(rotation_from_axis_angle_mat3(vec3(0, 0, 1), rand_interval(0, 6.18f)) * base_rot);
-
 }
+
+void object_model::init_trees_mountains(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env)
+{
+	init_objects(N, mountains_tree_position, min_dist, max_dist, min_height, z_offset_down, terrain_type, false, env);
+
+	mat3 base_rot = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.5f);
+	for (int i = 0; i < N; i++)
+		mountain_tree_rotations.push_back(rotation_from_axis_angle_mat3(vec3(0, 0, 1), rand_interval(0, 6.18f)) * base_rot);
+}
+
 
 void object_model::init_billboards(int N, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, terrain_model& env)
 {
@@ -162,6 +195,8 @@ void object_model::set_and_init_all(terrain_model& env)
 	init_trees(20, 13.0f, 30.0f, 2.0f, 1.5f, "volcano", env);
 	init_rocks1(1, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
 	init_rocks2(2, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
+
+	init_trees(80, 375, 475, 2.0f, 1.5f, "mountain", env);
 
 	init_trees(5, 0.0f, 300.0f, 6.0f, 2.0f, "sand", env);
 	init_rocks1(2, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
@@ -213,6 +248,13 @@ void object_model::draw_tree(std::map<std::string, GLuint>& shaders, scene_struc
 	for (int i = 0; i < tree_position.size(); i++) {
 		vec3 pos = tree_position[i];
 		palm_tree.uniform.transform.rotation = tree_rotations[i];
+		palm_tree.uniform.transform.translation = pos;
+		draw(palm_tree, scene.camera, shaders["mesh_sun"]);
+	}
+
+	for (int i = 0; i < mountains_tree_position.size(); i++) {
+		vec3 pos = tree_position[i];
+		palm_tree.uniform.transform.rotation = mountain_tree_rotations[i];
 		palm_tree.uniform.transform.translation = pos;
 		draw(palm_tree, scene.camera, shaders["mesh_sun"]);
 	}
