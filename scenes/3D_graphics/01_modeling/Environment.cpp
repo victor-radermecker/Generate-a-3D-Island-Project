@@ -225,7 +225,7 @@ void terrain_model::update_ocean(mesh_drawable& ocean, buffer<vec3>& current_pos
             // We assume it is constant
             // It has to be a multiple of 2*pi/tmax
             float min_pulsation = 2.0f * 3.14159f / tmax;
-            float pulsation = 2.0f * min_pulsation;
+            float pulsation = 24.0f * min_pulsation;
 
 
             // Compute coordinates : progressive wave
@@ -268,7 +268,7 @@ void terrain_model::set_ocean()
     ocean_connectivity = ocean_cpu.connectivity;
     ocean_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/ocean_texture.png"));
     ocean = ocean_cpu;
-    ocean.uniform.color = { 0.6f,1.0f,1.0f };
+    ocean.uniform.color = { 0.6f,0.7f,0.9f };
     ocean.uniform.transform.translation = { 0,0,1.0f };
 
     // Illumination parameters
