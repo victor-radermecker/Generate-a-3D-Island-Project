@@ -85,6 +85,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     
     
     // Draw treasure
+    //treasure.open_chest();
     treasure.draw_treasure(shaders, scene);
 
 

@@ -113,7 +113,7 @@ void terrain_model::set_terrain()
 
     terrain.push_back(create_terrain("volcano", { 0,0,0 }));
     terrain.push_back(create_terrain("sand", { 0,0,0 }));
-    terrain.push_back(create_terrain("mountain", { 0,0,-2.5f }));
+    terrain.push_back(create_terrain("mountain", { 0,0,-0.5f }));
 
 
     terrain[0].uniform.color = { 1.0f, 1.0f, 1.0f };
@@ -128,6 +128,10 @@ void terrain_model::set_terrain()
     terrain[1].uniform.shading.specular = 0.1;
     terrain[1].uniform.shading.specular_exponent = 64;
 
+    terrain[2].uniform.shading.ambiant = 0.6;
+    terrain[2].uniform.shading.diffuse = 0.8;
+    terrain[2].uniform.shading.specular = 0.1;
+    terrain[2].uniform.shading.specular_exponent = 64;
 
     texture_ids.sand_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/sand.png"));
     texture_ids.grass_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/grass-rock.png"));
@@ -348,8 +352,8 @@ vec3 terrain_model::evaluate_terrain_sand(float u, float v)
     const float noise = perlin(scaling * u, scaling * v, octave, persistency);
 
     float c = 0.3f + 0.7f * noise;
-    float x = 200 * (u - 0.5f);
-    float y = 200 * (v - 0.5f);
+    float x = 240 * (u - 0.5f);
+    float y = 240 * (v - 0.5f);
     float z = evaluate_terrain_z_sand(u, v);
     z *= 1 + c * std::exp(- abs(z) /15);
 
@@ -386,14 +390,14 @@ void island_param::set_island_parameters(std::vector<vec2>& u0, std::vector<floa
         //sigma.push_back(r1 / 10.0f);
     }
     int n = 3.5;
-    u0.push_back(vec2(0.2, 0.6));
-    u0.push_back(vec2(0.12, 0.15));
-    u0.push_back(vec2(0.2, 0.82));
-    u0.push_back(vec2(0.3, 0.14));
-    u0.push_back(vec2(0.1, 0.2));
-    u0.push_back(vec2(0.2, 0.35));
-    u0.push_back(vec2(0.9, 0.85));
-    u0.push_back(vec2(0.78, 0.32));
+    u0.push_back(vec2(0.25, 0.58));
+    u0.push_back(vec2(0.18, 0.21));
+    u0.push_back(vec2(0.25, 0.77));
+    u0.push_back(vec2(0.33, 0.2));
+    u0.push_back(vec2(0.17, 0.25));
+    u0.push_back(vec2(0.25, 0.375));
+    u0.push_back(vec2(0.83, 0.79));
+    u0.push_back(vec2(0.73, 0.35));
     sigma.push_back(0.2f/n);
     sigma.push_back(0.3f/n);
     sigma.push_back(0.25f/n);

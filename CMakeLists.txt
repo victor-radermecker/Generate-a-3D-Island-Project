@@ -32,7 +32,7 @@ file(
     scenes/*.[ch]pp
     scenes/*.glsl
     )
-add_executable(pgm ${source_files} "scenes/3D_graphics/01_modeling/Environment.cpp" "scenes/3D_graphics/01_modeling/Environment_Objects.cpp" "scenes/3D_graphics/01_modeling/Skybox.cpp"    "scenes/3D_graphics/01_modeling/Lava.cpp" "scenes/3D_graphics/01_modeling/Fauna.cpp")
+add_executable(pgm ${source_files} "scenes/3D_graphics/01_modeling/Environment.cpp" "scenes/3D_graphics/01_modeling/Environment_Objects.cpp" "scenes/3D_graphics/01_modeling/Skybox.cpp"    "scenes/3D_graphics/01_modeling/Lava.cpp" "scenes/3D_graphics/01_modeling/Fauna.cpp" "scenes/3D_graphics/01_modeling/Environment_Objects.cpp")
 
 
 if(UNIX)
