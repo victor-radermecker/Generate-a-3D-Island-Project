@@ -1,6 +1,5 @@
 #include <cmath>
 #include <iostream>
-
 #include "modeling.hpp"
 
 
@@ -9,46 +8,26 @@
 // Add vcl namespace within the current one - Allows to use function from vcl library without explicitely preceeding their name with vcl::
 using namespace vcl;
 
-
-
-/*
-float evaluate_terrain_z(float u, float v);
-vec3 evaluate_terrain(float u, float v);
-mesh create_terrain();
-*/
-
-//mesh create_ocean();
-//void update_ocean(mesh_drawable& ocean, buffer<vec3>& ocean_positions, buffer<vec3>& current_normals, buffer<uint3> connectivity, float t, float tmax, perlin_noise p);
-
-
-
 /** This function is called before the beginning of the animation loop
     It is used to initialize all part-specific data */
 void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_structure& scene, gui_structure& gui)
 {
-
-    // Create fauna
-    fauna.setup_bird();
-    fauna.set_bird_keyframes();
-
-    //shark
-    fauna.set_shark();
-    fauna.set_shark_keyframes();
+    // Create Fauna
+    fauna.init_fauna();
     
-    // Create and initialise terrain surface
+    // Create terrain surface
     env.set_terrain();
-    // Create and initialise ocean
-    env.set_ocean();
 
-    // Create treasure
-    treasure.create_treasure_box();
-    treasure.set_bridge();
-    treasure.set_canoe();
+    // Create ocean surface
+    //env.set_ocean();
 
-    //create first palm tree
-    objects.set_and_init_all(env);
+    // Create human environment (treasure chest, canoe and bridge)
+    treasure.init_all();
 
-    //setting lava in volcano
+    // Create natural objects (rocks, palm trees, etc)
+    //objects.set_and_init_all(env);
+
+    // Create lava and particles in the volcano
     lava.set_lava();
     lava.create_particule(shaders, scene);
 
@@ -61,9 +40,8 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     gui.show_frame_camera = false;
     gui.show_frame_worldspace = false;
 
-
-    // Setup skybox
-    skybox.set_skybox();
+    // Create Skybox
+    //skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 120.0f;
@@ -83,30 +61,18 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     //Update shaders
     update_shaders(t, shaders);
 
-
     set_gui();
     glEnable( GL_POLYGON_OFFSET_FILL ); // avoids z-fighting when displaying wireframe
     glPolygonOffset(1.0, 1.0);
 
 
 
-    //scene.gluPerspective(45.0f, (GLfloat)500 / (GLfloat)500, 0.5f, 3000000.0f);
-    // Draw treasure
-    //treasure.open_chest();
-    treasure.draw_treasure(shaders, scene);
-    treasure.draw_bridge(shaders, scene);
-    treasure.draw_canoe(shaders, scene);
-
-
     /********************************/
     /*         DISPLAY FAUNA       */
     /******************************/
-
     if (gui_scene.fauna) {
         fauna.update_bird();
         fauna.update_shark();
-
-
         //INTERACTION WITH SHARK/BIRD
         if (fauna.bird_clicked)
         {
@@ -118,7 +84,6 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
             scene.camera.translation = -fauna.shark.uniform.transform.translation - vec3(0, 0, 3.0f);
             scene.camera.orientation = fauna.shark.uniform.transform.rotation * mat3(0, 0, 1, 0, 1, 0, 1, 0, 0);
         }
-
         fauna.draw_bird(shaders, scene);
         fauna.draw_shark(shaders, scene);
         if (gui_scene.keyframes) {
@@ -126,6 +91,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
             fauna.draw_keyframes(shaders, scene, fauna.shark_keyframes, { 1,0,1 });
         }
     }
+
     /********************************/
     /*     DISPLAY ENV OBJECTS     */
     /******************************/
@@ -133,30 +99,28 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
         objects.draw_all(shaders, scene);
     }
 
-
     /**********************************/
-    //  Update and display ocean        //
-    /*********************************/
+    /*  Update and display ocean      */
+    /**********************************/
     if (gui_scene.ocean) {
         env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, env.ocean_perlin);
         env.draw_ocean(shaders, scene);
     }
 
-
-    /**********************************************************/
-    /********************* DISPLAY TERRAIN ********************/
-    /**********************************************************/
+    /********************************/
+    /*      DISPLAY TERRAIN         */
+    /********************************/
     if (gui_scene.terrain) {
         env.draw_terrain(shaders, scene);
     }
+    treasure.draw_all(shaders, scene);
 
     /**************************************/
-/*         DISPLAY SKYBOX            */
-/*************************************/
+    /*         DISPLAY SKYBOX            */
+    /*************************************/
     if (gui_scene.skybox) {
         skybox.draw_skybox(shaders, scene);
     }
-
 
     /**************************************/
     /*         DISPLAY PARTICLES          */
@@ -169,11 +133,9 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
 
     }
 
-    
     /******************************/
-    /*      BILLBOARDS            */
+    /*         BILLBOARDS         */
     /******************************/
-    
     if (gui_scene.billboards) {
         objects.draw_billboards(shaders, scene, objects.Identity3, objects.Rotation);
     }
@@ -260,9 +222,6 @@ void scene_model::update_shaders(float t, std::map<std::string, GLuint>& shaders
     uniform(shaders["mesh_sun"], "ambiant_sun", ambiant);
     uniform(shaders["mesh_sun"], "diffuse_sun", diffuse);
 
-
-
-
     /* FOR SKYBOX */
     vec3 color;
     if (time_normalized < 0.25)
@@ -312,6 +271,7 @@ void scene_model::set_gui()
 
 
 }
+
 
 
 

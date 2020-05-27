@@ -7,6 +7,11 @@ using namespace vcl;
 
 struct treasure_model
 {
+	
+	//init
+	void init_all();
+	void treasure_model::draw_all(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+	
 	vcl::hierarchy_mesh_drawable hierarchy_treasure;
 
 	//Functions

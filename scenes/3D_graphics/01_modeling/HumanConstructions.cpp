@@ -306,3 +306,19 @@ void treasure_model::draw_canoe(std::map<std::string, GLuint>& shaders, scene_st
 	canoe.uniform.transform.translation = canoe_position; 
 	draw(canoe, scene.camera, shaders["mesh_sun"]);
 }
+
+// init all
+
+void treasure_model::init_all()
+{
+    create_treasure_box();
+    set_bridge();
+    set_canoe();
+}
+
+void treasure_model::draw_all(std::map<std::string, GLuint>& shaders, scene_structure& scene)
+{
+    draw_treasure(shaders, scene);
+    draw_bridge(shaders, scene);
+    draw_canoe(shaders, scene);
+}

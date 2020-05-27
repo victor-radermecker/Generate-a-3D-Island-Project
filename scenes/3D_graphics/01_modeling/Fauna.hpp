@@ -10,6 +10,8 @@ struct vec3t {
 struct fauna_model
 {
 
+	//init all animals
+	void init_fauna();
 
 	// Animation Functions
 	void init_timer(vcl::timer_interval& timer_name, vcl::buffer<vec3t>& keys);
@@ -19,20 +21,18 @@ struct fauna_model
 	vcl::mat3 get_rotation(float t, vcl::buffer<vec3t>& keys);
 	size_t index_at_value(float t, vcl::buffer<vec3t>& keys);
 
-	//Drawing trajectory
-	// For displaying and moving the keyframes
+	//Drawing trajectory  (displaying and moving the keyframes)
+	void draw_keyframes(std::map<std::string, GLuint>& shaders, scene_structure& scene, vcl::buffer<vec3t>& keys, vcl::vec3 color);
 	vcl::mesh_drawable keyframe_visual;                    // keyframe samples
 	vcl::mesh_drawable keyframe_picked;                    // showing the picked sample
 	vcl::segment_drawable_immediate_mode segment_drawer;   // used to draw segments between keyframe samples
 	int picked_object;									   // Getting an element of the trajectory
 
-	void draw_keyframes(std::map<std::string, GLuint>& shaders, scene_structure& scene, vcl::buffer<vec3t>& keys, vcl::vec3 color);
 
 
+	/*        ANIMALS        */
 
-	/*        Drawing animals               */
-
-	//Bird Features
+	// Bird Features
 	vcl::timer_interval timer_fauna_bird;
 	vcl::hierarchy_mesh_drawable bird;
 	vcl::buffer<vec3t> bird_keyframes;
@@ -43,19 +43,18 @@ struct fauna_model
 	void update_bird();
 	void draw_bird(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 							   
-	//shark features
+	// Shark Features
 	vcl::timer_interval timer_fauna_shark;
 	vcl::mesh_drawable shark;
 	GLuint shark_texture_id;
 	vcl::buffer<vec3t> shark_keyframes;
 
-	//Shark functions
+	// Shark functions
 	vcl::mesh create_shark();
 	void set_shark();
 	void set_shark_keyframes();
 	void draw_shark(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void update_shark();
-
 
 	//User interation
 	void mouse_click(scene_structure& scene, GLFWwindow* window, int, int, int);
