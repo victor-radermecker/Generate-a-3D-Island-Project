@@ -47,7 +47,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     treasure.set_canoe();
 
     //create first palm tree
-    objects.set_and_init_all(env);
+    //objects.set_and_init_all(env);
 
     //setting lava in volcano
     lava.set_lava();
@@ -139,7 +139,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     //  Update and display ocean        //
     /*********************************/
     if (gui_scene.ocean) {
-        env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, t, timer.t_max, env.ocean_perlin);
+        env.update_ocean(env.ocean, env.ocean_positions, env.ocean_normals, env.ocean_connectivity, env.ocean_perlin);
         env.draw_ocean(shaders, scene);
     }
 
@@ -201,31 +201,45 @@ void scene_model::update_shaders(float t, std::map<std::string, GLuint>& shaders
     vec3 light = vec3(-800.0f * cos(3.14f / 60.0f * t), 300.0f, 200.0f * cos(3.14f / 60.0f * t));
 
     vec3 sun_color;
-    if (time_normalized < 0.25)
+    if (time_normalized < 0.25) //sun rise, 6:00 -> 12:00
     {
         sun_color = vec3(0.9 - 4 * 0.1 * time_normalized, 0.7, 0.5 + 4 * 0.1 * time_normalized);
-        ambiant = 0.6 + 4 * 0.3 * time_normalized;
-        diffuse = 0.6 + 4 * 0.2 * time_normalized;
+        ambiant = 0.5 + 4 * 0.4 * time_normalized;
+        diffuse = 0.3 + 4 * 0.5 * time_normalized;
 
     }
-    else if (time_normalized < 0.5)
+    else if (time_normalized < 0.4) // 12:00 -> 15:30
     {
-        sun_color = vec3(0.8 - 4 * 0.1 * (time_normalized - 0.25), 0.7 - 4 * 0.2 * (time_normalized - 0.25), 0.6 - 4 * 0.1 * (time_normalized - 0.25));
-        ambiant = 0.9 - 4 * 0.3 * (time_normalized - 0.25);
-        diffuse = 0.8 - 4 * 0.2 * (time_normalized - 0.25);
+        sun_color = vec3(0.8, 0.7, 0.6);
+        ambiant = 0.9;
+        diffuse = 0.8;
     }
-    else if (time_normalized < 0.75)
+    else if (time_normalized < 0.6) // 15:30 -> 19h30
     {
-        sun_color = vec3(0.7 - 4 * 0.5 * (time_normalized - 0.5), 0.5 - 4 * 0.3 * (time_normalized - 0.5), 0.5);
-        ambiant = 0.6 - 4 * 0.2 * (time_normalized - 0.5);
-        diffuse = 0.6 - 4 * 0.4 * (time_normalized - 0.5);
+        sun_color = vec3(0.8 - 5 * 0.1 * (time_normalized - 0.4), 0.7 - 5 * 0.2 * (time_normalized - 0.4), 0.6 - 5 * 0.1 * (time_normalized - 0.4));
+        ambiant = 0.9 - 5 * 0.3 * (time_normalized - 0.4);
+        diffuse = 0.8 - 5 * 0.2 * (time_normalized - 0.4);
+    }
+    else if (time_normalized < 0.75) // 19:30 -> 00:00
+    {
+        sun_color = vec3(0.7 - (1.0 / 0.15) * 0.5 * (time_normalized - 0.6), 0.5 - (1.0 / 0.15) * 0.3 * (time_normalized - 0.6), 0.5);
+        ambiant = 0.6 - (1.0 / 0.15) * 0.2 * (time_normalized - 0.6);
+        diffuse = 0.6 - (1.0 / 0.15) * 0.4 * (time_normalized - 0.6);
 
     }
-    else
+    else if (time_normalized < 0.9) // 19:30 -> 3:30
     {
-        sun_color = vec3(0.2 + 4 * 0.7 * (time_normalized - 0.75), 0.2 + 4 * 0.5 * (time_normalized - 0.75), 0.5);
-        ambiant = 0.4 + 4 * 0.2 * (time_normalized - 0.75);
-        diffuse = 0.2 + 4 * 0.4 * (time_normalized - 0.75);
+        sun_color = vec3(0.2, 0.2, 0.5);
+        ambiant = 0.4;
+        diffuse = 0.2;
+
+    }
+
+    else //3:30 -> 6:00
+    {
+        sun_color = vec3(0.2 + 10 * 0.7 * (time_normalized - 0.9), 0.2 + 10 * 0.5 * (time_normalized - 0.9), 0.5);
+        ambiant = 0.4 + 10 * 0.1 * (time_normalized - 0.9);
+        diffuse = 0.2 + 10 * 0.1 * (time_normalized - 0.9);
     }
 
     glUseProgram(shaders["terrain"]);
@@ -294,7 +308,8 @@ void scene_model::set_gui()
 
     ImGui::Spacing();
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
-    ImGui::SliderFloat("Time scale", &timer.scale, 1.0f, 20.0f);
+    ImGui::SliderFloat("Time scale", &timer.scale, 0.0f, 5.0f);
+
 
 }
 

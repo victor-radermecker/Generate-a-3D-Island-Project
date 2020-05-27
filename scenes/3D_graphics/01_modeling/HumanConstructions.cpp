@@ -73,7 +73,7 @@ void treasure_model::draw_treasure(std::map<std::string, GLuint>& shaders, scene
 void treasure_model::set_bridge()
 {
 	bridge = create_bridge();
-	bridge.uniform.transform.scaling = 0.025f;
+	bridge.uniform.transform.scaling_axis = { 0.035f, 0.035f, 0.05f };
 	bridge_position = vec3(-60.f, -9.1f, 3.5f);
 	bridge_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/bridge/textures/VARANDE_AO.png"));
 }

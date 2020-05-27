@@ -192,8 +192,12 @@ mesh terrain_model::create_ocean()
 }
 
 
-void terrain_model::update_ocean(mesh_drawable& ocean, buffer<vec3>& current_position, buffer<vec3>& current_normals, buffer<uint3> connectivity, float t, float tmax, perlin_noise p)
+void terrain_model::update_ocean(mesh_drawable& ocean, buffer<vec3>& current_position, buffer<vec3>& current_normals, buffer<uint3> connectivity, perlin_noise p)
 {
+    ocean_timer.update();
+    float t = ocean_timer.t;
+    float tmax = ocean_timer.t_max;
+
     const size_t N = 50;
     for (size_t ku = 0; ku < N; ++ku)
     {
@@ -274,6 +278,9 @@ void terrain_model::set_ocean()
     ocean_perlin.octave = 10;
     ocean_perlin.persistency = 0.55f;
     ocean_perlin.scaling = 2.0f;
+
+    ocean_timer.t_max = 120.0f;
+    ocean_timer.scale = 1.0f;
 }
 
 
@@ -375,11 +382,14 @@ void island_param::set_island_parameters(std::vector<vec2>& u0, std::vector<floa
     srand((unsigned)time(0)); // use current time as seed for random generator
     
     for (int i = 0;i < N;i++) {
-        float r2 = ((double)rand() / (RAND_MAX));
-        float r1 = ((double)rand() / (RAND_MAX));
-        //u0.push_back({ r1*0.8f,r2*0.8f  });
-        h.push_back(r1 * 15 + r2 * 15);
-        //sigma.push_back(r1 / 10.0f);
+        h.push_back(10);
+        h.push_back(5);
+        h.push_back(25);
+        h.push_back(17);
+        h.push_back(23);
+        h.push_back(7);
+        h.push_back(20);
+        h.push_back(3);
     }
     int n = 3.5;
     u0.push_back(vec2(0.25, 0.58));

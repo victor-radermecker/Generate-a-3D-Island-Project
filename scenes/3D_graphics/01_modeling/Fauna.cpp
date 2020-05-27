@@ -361,6 +361,7 @@ void fauna_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, i
     /******************/
     /*MOVING KEYFRAMES*/
     /******************/
+    // Used for adjusting the keyframes when necessary
     /*
     // Check if shift key is pressed
     if (mouse_click_left && key_shift)
@@ -370,12 +371,12 @@ void fauna_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, i
 
         // Check if this ray intersects a position (represented by a sphere)
         //  Loop over all positions and get the intersected position (the closest one in case of multiple intersection)
-        const size_t N = shark_keyframes.size();
+        const size_t N = bird_keyframes.size();
         picked_object = -1;
         float distance_min = 0.0f;
         for (size_t k = 0; k < N; ++k)
         {
-            const vec3 c = shark_keyframes[k].p;
+            const vec3 c = bird_keyframes[k].p;
             const picking_info info = ray_intersect_sphere(r, c, 0.1f);
 
             if (info.picking_valid) // the ray intersects a sphere
@@ -387,8 +388,8 @@ void fauna_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, i
                 }
             }
         }
-    }
-    */
+    }*/
+    
 
     /*   INTERACTING WITH SHARK   */
     if (mouse_click_left) {
@@ -449,26 +450,26 @@ void fauna_model::mouse_move(scene_structure& scene, GLFWwindow* window)
         // Compute intersection between current ray and the plane orthogonal to the view direction and passing by the selected object
         const vec2 cursor = glfw_cursor_coordinates_window(window);
         const ray r = picking_ray(scene.camera, cursor);
-        vec3& p0 = shark_keyframes[picked_object].p;
+        vec3& p0 = bird_keyframes[picked_object].p;
         const picking_info info = ray_intersect_plane(r, n, p0);
 
         // translate the position
         p0 = info.intersection;
 
         // If the selected point is a double point, move the other one too
-        size_t N = shark_keyframes.size();
+        size_t N = bird_keyframes.size();
         if (picked_object == 0 && N > 2)
-            shark_keyframes[N - 3].p = info.intersection;
+            bird_keyframes[N - 3].p = info.intersection;
         else if (picked_object == 1 && N > 1)
-            shark_keyframes[N - 2].p = info.intersection;
+            bird_keyframes[N - 2].p = info.intersection;
         else if (picked_object == 2 && N > 0)
-            shark_keyframes[N - 1].p = info.intersection;
+            bird_keyframes[N - 1].p = info.intersection;
         else if (N > 2 && picked_object == N - 2)
-            shark_keyframes[0].p = info.intersection;
+            bird_keyframes[0].p = info.intersection;
         else if (N > 1 && picked_object == N - 1)
-            shark_keyframes[1].p = info.intersection;
+            bird_keyframes[1].p = info.intersection;
         else if (N > 0 && picked_object == N)
-            shark_keyframes[0].p = info.intersection;
+            bird_keyframes[0].p = info.intersection;
     }
 }
 

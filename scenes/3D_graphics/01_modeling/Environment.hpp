@@ -48,7 +48,8 @@ struct terrain_model
 	GLuint ocean_texture_id;
 	vcl::mesh create_ocean();
 	vcl::vec3 evaluate_ocean(float u, float v);
-	void update_ocean(vcl::mesh_drawable& ocean, vcl::buffer<vcl::vec3>& current_position, vcl::buffer<vcl::vec3>& current_normals, vcl::buffer<vcl::uint3> connectivity, float t, float tmax, perlin_noise p);
+	vcl::timer_interval ocean_timer;
+	void update_ocean(vcl::mesh_drawable& ocean, vcl::buffer<vcl::vec3>& current_position, vcl::buffer<vcl::vec3>& current_normals, vcl::buffer<vcl::uint3> connectivity, perlin_noise p);
 	void set_ocean();
 
 	// Ocean
