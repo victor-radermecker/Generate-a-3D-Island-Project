@@ -13,9 +13,15 @@ struct treasure_model
 	void create_treasure_box();
 	void open_chest();
 	void draw_treasure(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+	mesh mesh_primitive_parallelepiped_chest(const vcl::vec3& p0, const vcl::vec3& u1, const vcl::vec3& u2, const vcl::vec3& u3, std::string part);
+	void mouse_click(scene_structure& scene, GLFWwindow* window, int, int, int);
+
+	bool open_chest_bool = false;
+	vec3 chest_position;
 
 	//Gluint wooden texture
 	GLuint wood_texture_id;
+	GLuint treasure_texture_id;
 
 
 	//Bridge

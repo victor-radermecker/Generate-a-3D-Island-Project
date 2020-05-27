@@ -28,7 +28,6 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
 {
 
     // Create fauna
-    //fauna.init_timer();
     fauna.setup_bird();
     fauna.set_bird_keyframes();
 
@@ -47,7 +46,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     treasure.set_canoe();
 
     //create first palm tree
-    //objects.set_and_init_all(env);
+    objects.set_and_init_all(env);
 
     //setting lava in volcano
     lava.set_lava();
@@ -185,6 +184,7 @@ void scene_model::mouse_click(scene_structure& scene, GLFWwindow* window, int x,
 {
     if(gui_scene.fauna)
         fauna.mouse_click(scene, window, x, y, z);
+    treasure.mouse_click(scene, window, x, y, z);
 }
 
 void scene_model::mouse_move(scene_structure& scene, GLFWwindow* window)

@@ -196,7 +196,7 @@ void object_model::set_and_init_all(terrain_model& env)
 	init_rocks1(1, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
 	init_rocks2(2, 10.0f, 20.0f, 2.0f, 1.0f, "volcano", env);
 
-	init_trees(80, 375, 475, 2.0f, 1.5f, "mountain", env);
+	init_trees(250, 375, 475, 2.0f, 1.5f, "mountain", env);
 
 	init_trees(5, 0.0f, 300.0f, 6.0f, 2.0f, "sand", env);
 	init_rocks1(2, 0.0f, 300.0f, 6.0f, 1.5f, "sand", env);
