@@ -43,11 +43,8 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
 
     // Create treasure
     treasure.create_treasure_box();
-<<<<<<< HEAD
     treasure.set_bridge();
     treasure.set_canoe();
-=======
->>>>>>> shaders
 
     //create first palm tree
     objects.set_and_init_all(env);
@@ -67,7 +64,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
 
 
     // Setup skybox
-    //skybox.set_skybox();
+    skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 120.0f;
