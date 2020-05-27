@@ -219,23 +219,19 @@ mesh treasure_model::mesh_primitive_parallelepiped_chest(const vec3& p0, const v
 
 void treasure_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, int, int)
 {
-    // Mouse click is used to select a position of the control polygon
-    // ******************************************************************** //
 
     // Cursor coordinates
     const vec2 cursor = glfw_cursor_coordinates_window(window);
 
     // Check that the mouse is clicked (drag and drop)
     const bool mouse_click_left = glfw_mouse_pressed_left(window);
-    const bool key_shift = glfw_key_shift_pressed(window);
 
 
-    /*   INTERACTING WITH SHARK   */
+    /*   INTERACTING WITH CHEST   */
     if (mouse_click_left) {
         const ray r = picking_ray(scene.camera, cursor);
-        //Trying to interact with the shark
         const vec3 chest_p = chest_position;
-        const picking_info info_chest = ray_intersect_sphere(r, chest_p, 1.f);
+        const picking_info info_chest = ray_intersect_sphere(r, chest_p, 1.5f);
         if (info_chest.picking_valid) // the ray intersects a sphere
         {
             open_chest();

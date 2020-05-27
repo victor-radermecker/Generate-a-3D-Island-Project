@@ -491,7 +491,6 @@ void island_param::set_mountains_parameters(std::vector<vec2>& u0_mountains, std
         float x = 0.5 + randt * radius * std::cos(i * alpha);
         float y = 0.5 + randt * radius * std::sin(i * alpha);
         u0_mountains.push_back({ x,y });
-        std::cout << x << "  " << y << std::endl;
         h_mountains.push_back(25.f * distrib_mountains(generator_mountains));
         sigma_mountains.push_back(0.1f * distrib_angle(generator_mountains));
     }
