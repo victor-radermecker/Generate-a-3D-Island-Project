@@ -66,7 +66,7 @@ struct terrain_model
 	vcl::vec3 evaluate_terrain_volcano(float u, float v);
 
 	//sand (little islands)
-	vcl::vec3 terrain_model::evaluate_terrain_sand(float u, float v);
+	vcl::vec3 evaluate_terrain_sand(float u, float v);
 	float evaluate_terrain_z_sand(float u, float v);
 
 	//Moutain chains
