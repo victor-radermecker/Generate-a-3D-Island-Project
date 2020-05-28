@@ -34,7 +34,7 @@ struct lava_model
 	vcl::mesh create_lava();
 	vcl::vec3 evaluate_lava(float u, float v);
 	void update_lava(vcl::mesh_drawable& ocean, vcl::buffer<vcl::vec3>& current_position, vcl::buffer<vcl::vec3>& current_normals, vcl::buffer<vcl::uint3> connectivity, float t, float tmax, perlin_noise p);
-	void lava_model::draw_lava(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+	void draw_lava(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void set_lava();
 
 	// Lava features
@@ -84,7 +84,7 @@ struct lava_model
 
 	vcl::mesh create_rock();
 	void set_rock();
-	void lava_model::draw_rock(std::map<std::string, GLuint>& shaders, scene_structure& scene);
+	void draw_rock(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 
 
 };
