@@ -75,7 +75,7 @@ mesh create_skybox_top(float size)
 
 void skybox_model::set_skybox()
 {
-    float size = 450.0f;
+    float size = 550;
     skybox.back = create_skybox_back(size);
     skybox.bottom = create_skybox_bottom(size);
     skybox.front = create_skybox_front(size);

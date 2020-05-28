@@ -1,10 +1,9 @@
 #include "Lava.hpp"
 #include <random>
 
-
-
 using namespace vcl;
 
+//Random number generators
 std::default_random_engine generator;
 std::uniform_real_distribution<float> distrib(0.001, 1.0);
 std::uniform_real_distribution<float> distrib2(0.98, 1.0);
@@ -13,14 +12,11 @@ std::uniform_real_distribution<float> distrib4(0.85, 1.0);
 std::uniform_real_distribution<float> distrib5(0.80, 1.0);
 
 
-vec3 lava_model::evaluate_lava(float u, float v)
-{
-    const float x = 5 * (u - 0.5f);
-    const float y = 5 * (v - 0.5f);
-    float z = 0.1f;
 
-    return { x,y,z };
-}
+// ------------------------------------------------------//
+//                     Particles                         //
+// ------------------------------------------------------//
+
 
 void lava_model::create_particule(std::map<std::string, GLuint>& shaders, scene_structure& scene)
 {
@@ -44,15 +40,14 @@ void lava_model::create_particule(std::map<std::string, GLuint>& shaders, scene_
     p0 = { 0,0,0 };
     v0 = vec3(0, 0, 0); //-->direction x et y au hasard et une vitesse verticale fixée
     scale = 1; 
-    //particles.push_back({ p0,v0,scale });
     fire_particle.p = p0; 
     fire_particle.v = v0;
     fire_particle.scale = scale;
+
     // Delay between emission of a new particles
     timer.periodic_event_time_step = 0.001f;
 
-
-
+    // Initialisation of all objects
     init_smoke(shaders, scene);
     init_fire(shaders, scene);
     set_rock();
@@ -78,24 +73,13 @@ void lava_model::update_particles()
 void lava_model::draw_particles(std::map<std::string, GLuint>& shaders, scene_structure& scene)
 {
     // Display particles
-    
-    for (particle_structure& part : particles)
-    {
-        //particle.uniform.transform.scaling = part.scale;
-        //particle.uniform.transform.translation = part.p;
-        //draw(particle, scene.camera, shaders["mesh"]);
-        //particle.uniform.transform.scaling = 1;
 
-
-    }
-
+    //Large particule (fire meteorite) 
     if (fire_particle.activated) {
-        //fire_sphere.uniform.transform.scaling = fire_particle.scale;
-        //fire_sphere.uniform.transform.translation = fire_particle.p;
-        //draw(fire_sphere, scene.camera, shaders["mesh"]);
         draw_rock(shaders, scene);
     }
 
+    //Fire behind the meteorite
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(shaders["mesh_sun"]);
     glEnable(GL_BLEND);
@@ -105,18 +89,10 @@ void lava_model::draw_particles(std::map<std::string, GLuint>& shaders, scene_st
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     sprite_fire.uniform.transform.rotation = scene.camera.orientation;
-
     for (particle_structure& part : fire_particles)
     {
-        //particle.uniform.transform.scaling = part.scale;
-        //particle.uniform.transform.translation = part.p;
-        //draw(particle, scene.camera, shaders["mesh"]);
-        //particle.uniform.transform.scaling = 1;
-
-
         sprite_fire.uniform.transform.scaling = 2.f * part.scale;
         sprite_fire.uniform.transform.translation = part.p;
-
         draw(sprite_fire, scene.camera, shaders["mesh"]);
     }
 
@@ -129,17 +105,19 @@ void lava_model::draw_particles(std::map<std::string, GLuint>& shaders, scene_st
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     sprite_smoke.uniform.transform.rotation = scene.camera.orientation;
 
+    //Smoke getting out of the volcano
     for (particle_structure& part : particles)
     {
-
         sprite_smoke.uniform.transform.scaling = 5.0f * part.scale;
         sprite_smoke.uniform.transform.translation = part.p;
-
         draw(sprite_smoke, scene.camera, shaders["mesh"]);
     }
     glDepthMask(true); // Important: reactivate writing in ZBuffer for future drawing
-
 }
+
+// ------------------------------------------------------//
+//                         Lava                          //
+// ------------------------------------------------------//
 
 
 mesh lava_model::create_lava()
@@ -161,7 +139,7 @@ mesh lava_model::create_lava()
         }
     }
     // Generate triangle organization
-    //  Parametric surface with uniform grid sampling: generate 2 triangles for each grid cell
+    // Parametric surface with uniform grid sampling: generate 2 triangles for each grid cell
     const unsigned int Ns = N;
     for (unsigned int ku = 0; ku < Ns - 1; ++ku)
     {
@@ -201,7 +179,7 @@ void lava_model::update_lava(mesh_drawable& lava, buffer<vec3>& current_position
             float k = 1.0f + 13.0f * exp(2.0f * norm(r));
 
             // Compute wave pulsation
-            float min_pulsation = 4.0f * 3.14159f / tmax ;
+            float min_pulsation = 4.0f * 3.14159f  ;
             float pulsation = 2.0f * min_pulsation;
 
             // Compute coordinates : progressive wave
@@ -218,8 +196,6 @@ void lava_model::update_lava(mesh_drawable& lava, buffer<vec3>& current_position
     lava.update_normal(current_normals);
     lava.update_position(current_position);
 }
-
-
 
 void lava_model::set_lava()
 {
@@ -256,6 +232,18 @@ void lava_model::draw_lava(std::map<std::string, GLuint>& shaders, scene_structu
 
 }
 
+vec3 lava_model::evaluate_lava(float u, float v)
+{
+    const float x = 5 * (u - 0.5f);
+    const float y = 5 * (v - 0.5f);
+    float z = 0.1f;
+
+    return { x,y,z };
+}
+
+// ------------------------------------------------------//
+//                    Init Objects                       //
+// ------------------------------------------------------//
 
 void lava_model::init_objects() {
     //create particle object
@@ -268,6 +256,11 @@ void lava_model::init_objects() {
     fire_sphere = mesh_primitive_sphere(r2);
     fire_sphere.uniform.color = { 1.f, 0.38f, 0.27f };
 }
+
+// ------------------------------------------------------//
+//                       SMOKE                           //
+// ------------------------------------------------------//
+
 
 
 void lava_model::update_smoke(bool is_new_particle, float dt)
@@ -407,6 +400,10 @@ void lava_model::init_fire(std::map<std::string, GLuint>& shaders, scene_structu
     sprite_fire.texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/smoke/fire.png"));
 
 }
+
+// ------------------------------------------------------//
+//                    ROCK                               //
+// ------------------------------------------------------//
 
 mesh lava_model::create_rock()
 {
