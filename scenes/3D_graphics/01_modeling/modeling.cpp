@@ -19,7 +19,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     env.set_terrain();
 
     // Create ocean surface
-    //env.set_ocean();
+    env.set_ocean();
 
     // Create human environment (treasure chest, canoe and bridge)
     treasure.init_all();
@@ -41,7 +41,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     gui.show_frame_worldspace = false;
 
     // Create Skybox
-    //skybox.set_skybox();
+    skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 120.0f;

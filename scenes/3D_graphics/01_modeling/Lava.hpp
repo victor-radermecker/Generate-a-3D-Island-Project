@@ -5,6 +5,8 @@
 
 struct particle_structure
 {
+	//Used to make the smoke out of the volcano
+
 	vcl::vec3 p; // Position
 	vcl::vec3 v; // Speed
 	float scale; // scale going from 0 (dissapear) to 1 (entire)
@@ -13,12 +15,13 @@ struct particle_structure
 
 struct fire_particle_structure
 {
+	//Used to make the lava meteorites getting out of the volcano
+
 	vcl::vec3 p; // Position
 	vcl::vec3 v; // Speed
 	float scale; // scale 
 	bool activated = false;
 	float theta = 0;
-	//std::vector<vcl::mat3> rotation = vcl::rotation_from_axis_angle_mat3(vec3(0, 0, 1), 1.57f);
 
 };
 
