@@ -38,8 +38,6 @@ void treasure_model::create_treasure_box()
     hierarchy_treasure.add(top, "top", "back", vec3(0, 0, l - h));
     hierarchy_treasure.add(top_gold, "top_gold", "bottom", vec3(h, h, l - 4 * h));
 
-    //mat3 const rot_top = rotation_from_axis_angle_mat3({ 0,1,0 }, -3.14f / 4);
-    //hierarchy_treasure["top"].transform.rotation = rot_top;
     hierarchy_treasure["bottom"].transform.scaling = 1.5f;
     chest_position = vec3(17.f, -5.f, 6.7f);
     hierarchy_treasure["bottom"].transform.translation = chest_position ;
@@ -59,8 +57,6 @@ void treasure_model::create_treasure_box()
 void treasure_model::open_chest()
 {
     //rotation of top
-
-
     if (open_chest_bool == false) {
         //opening the chest
         mat3 const rot_top = rotation_from_axis_angle_mat3({ 0,1,0 }, -3.14f / 3);
@@ -76,7 +72,6 @@ void treasure_model::open_chest()
     }
    
     hierarchy_treasure.update_local_to_global_coordinates();
-
 }
 
 void treasure_model::draw_treasure(std::map<std::string, GLuint>& shaders, scene_structure& scene)
@@ -202,21 +197,10 @@ mesh treasure_model::mesh_primitive_parallelepiped_chest(const vec3& p0, const v
                          top[0], top[1], top[2], top[3] };
     }
 
-
-
-    /*shape.texture_uv = { {0,0}, {0,1}, {1,1}, {1,0},        //bottom
-                            {0,0}, {0,1}, {1,1}, {1,0} ,        //front
-                            {0,0}, {0,1}, {1,1}, {1,0} ,        //right
-                            {0,0}, {0,1}, {1,1}, {1,0} ,        //back
-                            {0,0}, {0,1}, {1,1}, {1,0} ,        //left
-                            {0,0}, {0,1}, {1,1}, {1,0} };       //top
-                            */
-
     return shape;
 }
 
 //interacting with the treasure chest
-
 void treasure_model::mouse_click(scene_structure& scene, GLFWwindow* window, int, int, int)
 {
 
@@ -230,7 +214,7 @@ void treasure_model::mouse_click(scene_structure& scene, GLFWwindow* window, int
     /*   INTERACTING WITH CHEST   */
     if (mouse_click_left) {
         const ray r = picking_ray(scene.camera, cursor);
-        const vec3 chest_p = chest_position;
+        const vec3 chest_p = chest_position + vec3(0,1,0);
         const picking_info info_chest = ray_intersect_sphere(r, chest_p, 1.5f);
         if (info_chest.picking_valid) // the ray intersects a sphere
         {
@@ -240,10 +224,7 @@ void treasure_model::mouse_click(scene_structure& scene, GLFWwindow* window, int
 }
 
 
-
-
 // Create the bridge
-
 void treasure_model::set_bridge()
 {
 	bridge = create_bridge();
@@ -251,7 +232,6 @@ void treasure_model::set_bridge()
 	bridge_position = vec3(-60.f, -9.1f, 3.5f);
 	bridge_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/bridge/textures/VARANDE_AO.png"));
 }
-
 
 mesh treasure_model::create_bridge()
 {
@@ -276,12 +256,18 @@ void treasure_model::draw_bridge(std::map<std::string, GLuint>& shaders, scene_s
 }
 
 // Create the canoe
-
 void treasure_model::set_canoe()
 {
 	canoe = create_canoe();
 	canoe.uniform.transform.scaling = 1.f;
 	canoe_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/canoe/wood.png"));
+
+    canoe_position = vec3(27.f, -10.1f, 3.5f);
+    mat3 rot_canoe = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.57f);
+    mat3 rot_canoe2 = rotation_from_axis_angle_mat3(vec3(0, 0, 1), -1.57f / 3.5);
+    canoe.uniform.transform.rotation = rot_canoe * rot_canoe2;
+    canoe.uniform.transform.translation = canoe_position;
+
 }
 
 
@@ -299,16 +285,10 @@ void treasure_model::draw_canoe(std::map<std::string, GLuint>& shaders, scene_st
 	glBindTexture(GL_TEXTURE_2D, canoe_texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	canoe_position = vec3(27.f, -10.1f, 3.5f);
-	mat3 rot_canoe = rotation_from_axis_angle_mat3(vec3(1, 0, 0), 1.57f);
-	mat3 rot_canoe2 = rotation_from_axis_angle_mat3(vec3(0, 0, 1), -1.57f/3.5);
-	canoe.uniform.transform.rotation = rot_canoe * rot_canoe2;
-	canoe.uniform.transform.translation = canoe_position; 
 	draw(canoe, scene.camera, shaders["mesh_sun"]);
 }
 
 // init all
-
 void treasure_model::init_all()
 {
     create_treasure_box();

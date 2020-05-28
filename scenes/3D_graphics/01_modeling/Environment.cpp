@@ -1,8 +1,6 @@
 #define _USE_MATH_DEFINES
 
 #include "Environment.hpp"
-#include <algorithm>
-#include <iostream> 
 #include <stdlib.h>    
 #include <ctime>
 #include <cmath>
@@ -25,7 +23,7 @@ std::uniform_real_distribution<float> distrib_angle(0.9, 1.15);
 mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 })
 {
     // Number of samples of the terrain is N x N
-    const size_t N = 300;
+    const size_t N = 600;
     mesh terrain; // temporary terrain storage (CPU only)
     terrain.position.resize(N * N);
     terrain.texture_uv.resize(N * N); //Initalize buffer for textures
@@ -34,7 +32,7 @@ mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 
         for (size_t kv = 0; kv < N; ++kv)
         {
             // Compute local parametric coordinates (u,v) \in [0,1]
-            const float u = ku / (N - 1.0f); // ex. u=0.5 quand on est à la fin du terrain donc u = 99/99 = 1
+            const float u = ku / (N - 1.0f); 
             const float v = kv / (N - 1.0f);
             vec3 position = evaluate_terrain(u, v, type, p0);
             // Compute coordinates
@@ -43,8 +41,6 @@ mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 
                 terrain.texture_uv[kv + N * ku] = { 15.0f * u , 15.0f * v  };
             else
                 terrain.texture_uv[kv + N * ku] = { 30.0f * u, 30.0f * v };
-
-            //terrain.color[kv + N * ku] = { c,c,c,1.0f };
         }
     }
     // Generate triangle organization
@@ -65,7 +61,6 @@ mesh terrain_model::create_terrain(std::string type = "None", vec3 p0 = { 0,0,0 
     }
     return terrain;
 }
-
 
 
 vec3 terrain_model::evaluate_terrain(float u, float v, std::string type = "None", vec3 p0 = { 0,0,0 })
@@ -114,9 +109,6 @@ void terrain_model::set_terrain()
     terrain.push_back(create_terrain("volcano", { 0,0,0 }));
     terrain.push_back(create_terrain("sand", { 0,0,0 }));
     terrain.push_back(create_terrain("mountain", { 0,0,-0.5f }));
-
-
-    terrain[0].uniform.color = { 1.0f, 1.0f, 1.0f };
 
     terrain[0].uniform.shading.specular = 0.1;
     terrain[0].uniform.shading.specular_exponent = 64;
@@ -235,23 +227,9 @@ void terrain_model::update_ocean(mesh_drawable& ocean, buffer<vec3>& current_pos
             const float noise = perlin(scaling * (u - 0.5f), scaling * (v - 0.5f), p.octave, p.persistency);
             current_position[kv + N * ku][2] *= noise;
 
-            /*
-            // If the wave "hit" the ground
-            // To modify later : ut and vt are the generalised coordinates in the referential of the terrain
-            float ut = (u - 0.25f) * 2.0f;
-            float vt = (v - 0.25f) * 2.0f;
-
-            if (ut <= 1 && ut >= 0 && vt <= 1 && vt >= 0)
-            {
-                float terrain_height = evaluate_terrain_z(ut, vt);
-                if (old_position > terrain_height && current_position[kv + N * ku][2] <= terrain_height)
-                {
-                    current_position[kv + N * ku][2] = terrain_height - 0.005f;
-                }
-            }
-            */
         }
     }
+    // Update the normals of the triangles, as well as their positions
     vcl::normal(current_position, connectivity, current_normals);
     ocean.update_normal(current_normals);
     ocean.update_position(current_position);
@@ -274,10 +252,10 @@ void terrain_model::set_ocean()
     ocean.uniform.shading.specular_exponent = 512;
 
 
-    ocean_perlin.height = 0.05f;
+    ocean_perlin.height = 0.1f;
     ocean_perlin.octave = 10;
     ocean_perlin.persistency = 0.55f;
-    ocean_perlin.scaling = 2.0f;
+    ocean_perlin.scaling = 3.0f;
 
     ocean_timer.t_max = 120.0f;
     ocean_timer.scale = 1.0f;
@@ -379,7 +357,6 @@ float terrain_model::evaluate_terrain_z_sand(float u, float v)
 void island_param::set_island_parameters(std::vector<vec2>& u0, std::vector<float>& h, std::vector<float>& sigma, int& N)
 {
     N = 8;
-    srand((unsigned)time(0)); // use current time as seed for random generator
     
     for (int i = 0;i < N;i++) {
         h.push_back(10);
@@ -414,6 +391,7 @@ void island_param::set_island_parameters(std::vector<vec2>& u0, std::vector<floa
 
 void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_structure& scene)
 {
+    // Draw volcano
     glUseProgram(shaders["terrain"]);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
@@ -433,11 +411,10 @@ void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_s
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     uniform(shaders["terrain"], "rock_sampler", 2);
 
-
-
     draw(terrain[0], scene.camera, shaders["terrain"]);
 
 
+    // Draw mountains
     glUseProgram(shaders["terrain1"]);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_ids.sand_id);
@@ -452,8 +429,6 @@ void terrain_model::draw_terrain(std::map<std::string, GLuint>& shaders, scene_s
     uniform(shaders["terrain1"], "grass_sampler", 1);
 
     draw(terrain[1], scene.camera, shaders["terrain1"]);
-
-
     draw(terrain[2], scene.camera, shaders["terrain1"]);
 
 }
@@ -523,26 +498,11 @@ vec3 terrain_model::evaluate_terrain_mountain(float u, float v)
 
 float terrain_model::evaluate_terrain_z_mountain(float u, float v)
 {
-    //        - a very flat gaussian function for the circle
-    //        - a similar one but negative
     float z = 0;
-    //const std::vector<vec2> u0 = { {0.25f,0.25f},{0.75f,0.75f},{0.25f,0.75f},{0.75f,0.25f} };
-    //const float h0 = 20.f;
-    //const float sigma0 = 0.05f;
-    
-
     for (int i = 0;i < islands.N_mountains;i++) {
         float d = norm(vec2(u, v) - islands.u0_mountains[i]) / islands.sigma_mountains[i];
         z += islands.h_mountains[i] * std::exp(-d * d);
     }
-    /*
-    //normal - very flat a large
-    const float d = norm(vec2(u, v) - u0) / sigma0;
-    z = h0 * std::exp(-d * d);
-    */
-    //normal 2 (cratère)
-    //const float d2 = norm(vec2(u, v) - u0) / (sigma0 / 2);
-    //z -= (h0 / 2) * std::exp(-d2 * d2);
 
     return z;
 

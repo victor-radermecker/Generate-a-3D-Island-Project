@@ -18,8 +18,6 @@ struct fire_particle_structure
 	float scale; // scale 
 	bool activated = false;
 	float theta = 0;
-	//std::vector<vcl::mat3> rotation = vcl::rotation_from_axis_angle_mat3(vec3(0, 0, 1), 1.57f);
-
 };
 
 

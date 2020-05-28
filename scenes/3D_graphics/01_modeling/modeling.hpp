@@ -21,6 +21,7 @@ struct gui_scene_structure
     bool terrain = true;
     bool particles = false;
     bool fauna = false;
+    bool human_constructions = false;
     bool keyframes = false;
 };
 

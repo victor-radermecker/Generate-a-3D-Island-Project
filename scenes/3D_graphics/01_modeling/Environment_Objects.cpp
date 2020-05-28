@@ -47,7 +47,6 @@ mesh object_model::create_palm_tree()
 void object_model::set_palm_tree()
 {
 	palm_tree = create_palm_tree();
-	//palm_tree.uniform.transform.scaling = 0.02f;
 	palm_tree_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/palm/leaf_front1.png"));
 }
 
@@ -87,7 +86,7 @@ void object_model::init_objects(int N, std::vector<vcl::vec3>& list_position, fl
 
 void object_model::update_random_position(int N, std::vector<vcl::vec3>& list_position, float min_dist, float max_dist, float min_height, float z_offset_down, std::string terrain_type, bool is_billboard, terrain_model& env)
 {
-	//N is the total number of trees to place, i is the number currently places
+	//N is the total number of objects to place, i is the number currently places
 	int i = 0;
 	while (i < N) {
 
@@ -97,8 +96,6 @@ void object_model::update_random_position(int N, std::vector<vcl::vec3>& list_po
 			float radius = distrib_mountains_tree(generator_palm_trees);
 			float u = 0.5f + radius * std::cos(theta);
 			float v = 0.5f + radius * std::sin(theta);
-			//float u = distrib_mountains_tree_angle(generator_palm_trees);
-			//float v = distrib_mountains_tree_angle(generator_palm_trees);
 			vec3 pos = env.evaluate_terrain(v, u, "mountain", { 0,0,0 });
 			i++;
 			list_position.push_back(pos - vec3(0, 0, z_offset_down));
@@ -186,8 +183,6 @@ void object_model::init_billboards(int N, float min_dist, float max_dist, float 
 void object_model::set_and_init_all(terrain_model& env)
 {
 	set_palm_tree();
-	set_palm_tree2();
-
 	set_rock1();
 	set_rock2();
 	set_billboards();
@@ -264,7 +259,6 @@ void object_model::draw_all(std::map<std::string, GLuint>& shaders, scene_struct
 	draw_rock1(shaders, scene);
 	draw_rock2(shaders, scene);
 	draw_tree(shaders, scene);
-	//draw_billboards(shaders, scene, Identity3, Rotation);
 }
 
 
@@ -340,29 +334,3 @@ void object_model::draw_billboards(std::map<std::string, GLuint>& shaders, scene
 
 }
 
-// Palm Tree 2
-
-
-mesh object_model::create_palm_tree2()
-{
-	mesh palm_cpu = mesh_load_file_obj("scenes/3D_graphics/02_texture/assets/palm2/OBJ/CoconutPalm.obj");
-	return palm_cpu;
-}
-
-void object_model::set_palm_tree2()
-{
-	palm_tree2 = create_palm_tree2();
-	palm_tree2.uniform.transform.scaling = 0.5f;
-	//palm_tree2_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/palm2/OBJ/Stem_3_Normal.png"));
-}
-
-void object_model::draw_palm_tree2(std::map<std::string, GLuint>& shaders, scene_structure& scene)
-{
-	glUseProgram(shaders["mesh_sun"]);
-	glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, palm_tree2_texture_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	draw(palm_tree2, scene.camera, shaders["mesh_sun"]);
-
-}

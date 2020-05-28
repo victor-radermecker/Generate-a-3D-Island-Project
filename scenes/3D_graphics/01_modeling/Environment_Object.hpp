@@ -40,13 +40,8 @@ struct object_model
 	vcl::mesh create_palm_tree();
 	void set_palm_tree();
 
-	vcl::mesh create_palm_tree2();
-	void set_palm_tree2();
-
 	vcl::mesh_drawable palm_tree;
 	GLuint palm_tree_texture_id;
-	vcl::mesh_drawable palm_tree2;
-	GLuint palm_tree2_texture_id;
 
 
 
@@ -94,7 +89,6 @@ struct object_model
 	void draw_rock2(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void draw_tree(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 	void draw_all(std::map<std::string, GLuint>& shaders, scene_structure& scene);  
-	void draw_palm_tree2(std::map<std::string, GLuint>& shaders, scene_structure& scene);
 
 	void draw_billboards(std::map<std::string, GLuint>& shaders, scene_structure& scene, vcl::mat3& Identity, vcl::mat3& R);
 };

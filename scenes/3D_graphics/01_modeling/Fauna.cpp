@@ -430,18 +430,17 @@ void fauna_model::set_shark()
 {
     shark = create_shark();
     shark.uniform.transform.scaling_axis = { 3.2f,4.0,3.2f };
-    //shark_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/asserts/shark/Sharktexture002.png"));
+    shark_texture_id = create_texture_gpu(image_load_png("scenes/3D_graphics/02_texture/assets/shark/Sharktexture002.png"));
     shark_clicked = false;
 }
 
 void fauna_model::draw_shark(std::map<std::string, GLuint>& shaders, scene_structure& scene)
 {
-    glEnable(GL_POLYGON_OFFSET_FILL); // avoids z-fighting when displaying wireframe
     glBindTexture(GL_TEXTURE_2D, shark_texture_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); // avoids sampling artifacts
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT); // avoids sampling artifacts
     shark.uniform.color = { 1.f,1.f,1.f };
-    draw(shark, scene.camera, shaders["mesh"]);
+    draw(shark, scene.camera, shaders["mesh_sun"]);
 }
 
 

@@ -1,8 +1,4 @@
 #include "Skybox.hpp"
-#include <algorithm>
-#include <iostream> 
-#include <stdlib.h>    
-#include <ctime>
 
 using namespace vcl;
 

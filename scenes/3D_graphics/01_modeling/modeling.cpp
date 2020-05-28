@@ -19,7 +19,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     env.set_terrain();
 
     // Create ocean surface
-    //env.set_ocean();
+    env.set_ocean();
 
     // Create human environment (treasure chest, canoe and bridge)
     treasure.init_all();
@@ -33,15 +33,15 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
 
     // Setup initial camera mode and position
     scene.camera.camera_type = camera_control_spherical_coordinates;
-    scene.camera.scale = 10.0f;
-    scene.camera.apply_rotation(0,0,0,1.2f);
+    scene.camera.scale = 100.0;
+    scene.camera.apply_rotation(0,0,0,1.4f);
 
     // Setup gui
     gui.show_frame_camera = false;
     gui.show_frame_worldspace = false;
 
     // Create Skybox
-    //skybox.set_skybox();
+    skybox.set_skybox();
 
     // Timer parameters
     timer.t_max = 120.0f;
@@ -95,6 +95,7 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     /********************************/
     /*     DISPLAY ENV OBJECTS     */
     /******************************/
+    // Displays trees, rocks but not billboards
     if (gui_scene.trees) {
         objects.draw_all(shaders, scene);
     }
@@ -113,7 +114,13 @@ void scene_model::frame_draw(std::map<std::string,GLuint>& shaders, scene_struct
     if (gui_scene.terrain) {
         env.draw_terrain(shaders, scene);
     }
-    treasure.draw_all(shaders, scene);
+
+    /*******************************/
+    /*  DISPLAY HUMAN CONSTRUCTIONS */
+    /*******************************/
+    if (gui_scene.human_constructions) {
+        treasure.draw_all(shaders, scene);
+    }
 
     /**************************************/
     /*         DISPLAY SKYBOX            */
@@ -257,18 +264,16 @@ void scene_model::set_gui()
 {
     ImGui::Checkbox("Terrain", &gui_scene.terrain);
     ImGui::Checkbox("Ocean", &gui_scene.ocean);
-    ImGui::Checkbox("Trees", &gui_scene.trees);
     ImGui::Checkbox("Skybox", &gui_scene.skybox);
-    ImGui::Checkbox("Billboards", &gui_scene.billboards);
-    ImGui::Checkbox("Particles", &gui_scene.particles);
+    ImGui::Checkbox("Trees and rocks", &gui_scene.trees);
+    ImGui::Checkbox("Human constructions", &gui_scene.human_constructions);
     ImGui::Checkbox("Fauna", &gui_scene.fauna);
-    ImGui::Checkbox("Keyframes", &gui_scene.keyframes);
-
+    ImGui::Checkbox("Billboards", &gui_scene.billboards);
+    ImGui::Checkbox("Lava and smoke", &gui_scene.particles);
 
     ImGui::Spacing();
     ImGui::SliderFloat("Time", &timer.t, timer.t_min, timer.t_max);
     ImGui::SliderFloat("Time scale", &timer.scale, 0.0f, 5.0f);
-
 
 }
 
