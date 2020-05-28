@@ -25,7 +25,7 @@ void scene_model::setup_data(std::map<std::string,GLuint>& shaders , scene_struc
     treasure.init_all();
 
     // Create natural objects (rocks, palm trees, etc)
-    //objects.set_and_init_all(env);
+    objects.set_and_init_all(env);
 
     // Create lava and particles in the volcano
     lava.set_lava();
