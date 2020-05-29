@@ -122,7 +122,7 @@ void lava_model::draw_particles(std::map<std::string, GLuint>& shaders, scene_st
 
 mesh lava_model::create_lava()
 {
-    const size_t N = 20;
+    const size_t N = 10;
     mesh lava; 
     lava.position.resize(N * N);
     lava.texture_uv.resize(N * N);
