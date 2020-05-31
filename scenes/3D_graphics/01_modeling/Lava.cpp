@@ -45,7 +45,7 @@ void lava_model::create_particule(std::map<std::string, GLuint>& shaders, scene_
     fire_particle.scale = scale;
 
     // Delay between emission of a new particles
-    timer.periodic_event_time_step = 0.001f;
+    timer.periodic_event_time_step = 0.0001f;
 
     // Initialisation of all objects
     init_smoke(shaders, scene);
@@ -122,7 +122,7 @@ void lava_model::draw_particles(std::map<std::string, GLuint>& shaders, scene_st
 
 mesh lava_model::create_lava()
 {
-    const size_t N = 10;
+    const size_t N = 40;
     mesh lava; 
     lava.position.resize(N * N);
     lava.texture_uv.resize(N * N);
@@ -355,7 +355,7 @@ void lava_model::update_fire_cloud(bool is_new_particle, float dt)
         const vec3 p0 = fire_particle.p;
         const float scale = 1;
         // Initial speed is the opposite of the random particle speed
-        fire_particles.push_back({ p0, fire_particle.v ,scale });
+        fire_particles.push_back({ p0, fire_particle.v ,scale });   
     }
 
     // Update particule size and remove them if they are too small  
